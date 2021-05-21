@@ -1,11 +1,15 @@
 import Phaser from 'phaser';
+import Smoke from './scenes/Smoke';
 import Preloader from './scenes/Preloader';
+import Fruit from './scenes/Fruit';
+import Example from './scenes/Example';
 
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
-	width: 800,
-	height: 600,
+	width: 1400,
+	height: 1000
+	,
 	physics: {
 		default: 'arcade',
 		arcade: {
@@ -14,7 +18,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		},
 	},
 	transparent: false,
-	scene: [Preloader]
+	scene: [Preloader,Example,Fruit, Smoke, ]
 }
 
 export default new Phaser.Game(config)
