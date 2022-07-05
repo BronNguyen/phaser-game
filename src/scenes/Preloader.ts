@@ -6,6 +6,8 @@ export default class Preloader extends Phaser.Scene {
     super(SceneKeys.Preloader);
   }
   preload() {
+    this.load.image("player", "assets/game-objects/player.png");
+
     this.load.atlas(
       "flares",
       "assets/particles/flares.png",
@@ -34,6 +36,6 @@ export default class Preloader extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start(SceneKeys.Example);
+    this.scene.start(SceneKeys.Battle);
   }
 }

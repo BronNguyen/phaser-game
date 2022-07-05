@@ -1,67 +1,104 @@
-import Phaser from "phaser";
-import SceneKeys from "../const/SceneKeys";
+import Phaser from "phaser"
+import SceneKeys from "../const/SceneKeys"
 
 export default class Example extends Phaser.Scene {
-    constructor() {
-        super(SceneKeys.Example)
-    }
-    create() {
-        this.add.image(400, 16, 'bg').setOrigin(0.5, 0);
+    cameraControl!: Phaser.Cameras.Controls.SmoothedKeyControl
 
-        for (var i = 0; i < 13; i++)
-        {
-            this.add.image(64 * i, 536, 'tiles', 1).setOrigin(0);
+    constructor() {
+        super({key:SceneKeys.Example, active: false})
+    }
+
+    preload(){
+
+    }
+
+    create() {
+        const cursors = this.input.keyboard.createCursorKeys()
+
+
+        const controlConfig = {
+            camera: this.cameras.main,
+            left: cursors.left,
+            right: cursors.right,
+            up: cursors.up,
+            down: cursors.down,
+            zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q),
+            zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
+            acceleration: 0.35,
+            drag: 0.01,
+            maxSpeed: 1.0
         }
 
-        var text = this.add.text(400, 8, 'Click to play animation chain', { color: '#ffffff' }).setOrigin(0.5, 0);
+        this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig)
 
-        //  Our animations
-        this.anims.create({
-            key: 'guardStart',
-            frames: this.anims.generateFrameNames('knight', { prefix: 'guard_start/frame', start: 0, end: 3, zeroPad: 4 }),
-            frameRate: 8
-        });
 
-        this.anims.create({
-            key: 'guard',
-            frames: this.anims.generateFrameNames('knight', { prefix: 'guard/frame', start: 0, end: 5, zeroPad: 4 }),
-            frameRate: 8,
-            repeat: 2
-        });
+        const payload = {
+            x: 50,
+            y: 200,
+            width: 300,
+            height: 500,
+            background: 0x000000,
+            rightCorner: 0x03609d,
+            rightEdge: 0x0674b4,
+            bottomEdge: 0x01467f,
+            foreground: 0x025f9f
+        }
+        this.createPopup({payload})
 
-        this.anims.create({
-            key: 'guardEnd',
-            frames: this.anims.generateFrameNames('knight', { prefix: 'guard_end/frame', start: 0, end: 3, zeroPad: 4 }),
-            frameRate: 8
-        });
 
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNames('knight', { prefix: 'idle/frame', start: 0, end: 5, zeroPad: 4 }),
-            frameRate: 8,
-            repeat: -1
-        });
+    }
 
-        var lancelot = this.add.sprite(500, 536,"knight")
+    createPopup = ({payload}): void => {
+        const {x, y, width, height, background, rightCorner, rightEdge, bottomEdge, foreground} = payload
+        const graphics = this.add.graphics({x:0,y:0})
+        const rect = new Phaser.Geom.Rectangle(x,y, width, height)
 
-        lancelot.setOrigin(0.5, 1);
-        lancelot.setScale(10);
-        lancelot.play('idle');
+        //black bg
+        graphics.fillStyle(background)
+        graphics.fillRoundedRect(rect.left,rect.top, rect.width, rect.height, {tl:8,tr:8, bl:4,br:4})
 
-        lancelot.on(Phaser.Animations.Events.ANIMATION_START, function (anim) {
+        //bottom right corner
+        graphics.fillStyle(rightCorner)
+        graphics.fillRoundedRect(rect.left+3, rect.bottom - 50, rect.width - 6, 50 - 6,{tl:0,tr:0, bl:30,br:8})
 
-            text.setText('Playing ' + anim.key);
+        //cyan color right edge
+        graphics.fillStyle(rightEdge)
+        graphics.fillRoundedRect(rect.left+3, rect.top+ 3, rect.width - 6, rect.height - 19,{tl:8,tr:8, bl:30,br:12})
 
-        });
+        //bottom 3d line
+        graphics.fillStyle(bottomEdge)
+        graphics.fillRoundedRect(rect.left+3, rect.bottom - 50, rect.width - 12, 50 - 6,{tl:8,tr:0, bl:8,br:0})
 
-        this.input.on('pointerdown', function () {
+        //gradient fg
+        graphics.fillStyle(foreground)
+        graphics.fillRoundedRect(rect.left+3, rect.top+ 6, rect.width - 12, rect.height - 24,{tl:8,tr:8, bl:6,br:0})
 
-            if (lancelot.anims.getName() === 'idle')
-            {
-                lancelot.playAfterRepeat('guardStart');
-                lancelot.chain([ 'guard', 'guardEnd', 'idle' ]);
-            }
+        const texture = this.textures.createCanvas('foreground', rect.width - 14, rect.height - 20);
+        const gradient = texture.context.createLinearGradient(0, 0, 0, 256);
+        gradient.addColorStop(0, '#000000')
+        gradient.addColorStop(1, '#025f9f')
 
-        }, this);
+        texture.context.fillStyle = gradient
+        texture.context.fillRect(0, 0, rect.width - 12,rect.height - 24)
+        texture.refresh();
+        const image = this.add.image(rect.left+3 , rect.top+ 6, 'foreground').setOrigin(0);
+
+        //make shadow
+        graphics.fillStyle(0x000000,.3)
+        graphics.fillRoundedRect(rect.left, rect.bottom - 10, rect.width,   20 ,{tl:0,tr:0, bl:12,br:12})
+
+        //set light
+        const radius = rect.width
+        const intensity = 0.1
+        const attenuation = 0.05
+        let light = this.add.pointlight(rect.centerX, rect.centerY - height / 12, 0, radius, intensity, attenuation)
+        light.color.setTo(255, 255, 255)
+
+    }
+
+
+    update (time, delta)
+    {
+        this.cameraControl.update(delta)
     }
 }
