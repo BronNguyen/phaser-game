@@ -2,22 +2,20 @@ import TeamKeys from "../const/TeamKeys"
 import PlayerState from "../const/PlayerState"
 import ITeam from "../interface/ITeam"
 import IPlayer from "../interface/IPlayer"
+import PlayerColors from "../const/PlayerColors"
 
 export default class Player extends Phaser.GameObjects.Image implements IPlayer ,ITeam , IRollDice {
     color: number
     teamKey = TeamKeys.Red
     playerState = PlayerState.Init
 
-    constructor(scene: Phaser.Scene, x: number, y: number, color: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, teamKey: TeamKeys) {
         super(scene, x, y, 'player')
         this.setScale(0.3)
+        const color = PlayerColors[teamKey]
         this.color = color
         this.setTintFill(color)
-        // scene.add.existing(this)
-    }
-
-    initTeam(): void {
-
+        scene.add.existing(this)
     }
 
     getTeamKey(): TeamKeys {

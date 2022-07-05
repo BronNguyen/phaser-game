@@ -37,10 +37,6 @@ export default class Horse extends Phaser.GameObjects.Arc implements IHorse, ITe
         this.horseState = HorseState.Dead
     }
 
-    initTeam(): void {
-
-    }
-
     getTeamKey(): TeamKeys {
         return this.teamKey
     }

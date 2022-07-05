@@ -4,7 +4,6 @@ interface ITeam {
     teamKey: TeamKeys
     color: number
 
-    initTeam(): void
     getTeamKey(): TeamKeys
     getColor(): number
 }
