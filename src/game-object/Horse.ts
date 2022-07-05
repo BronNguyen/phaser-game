@@ -4,18 +4,23 @@ import IHorse from "../interface/IHorse"
 import ITeam from "../interface/ITeam"
 import TeamKeys from "../const/TeamKeys"
 
-export default class Horse extends Phaser.GameObjects.Arc implements IHorse, ITeam {
+export default class Horse extends Phaser.GameObjects.Image implements IHorse, ITeam {
     horseState = HorseState.Dead
     color!: number
     teamKey = TeamKeys.Red
     currentPlace = 0
     index: number = 0
 
-    constructor(scene: Phaser.Scene,index: number, state = HorseState.Dead, team: PlayerColors , x: number, y: number, radius: number, fillColor: number) {
-        super(scene, x, y, radius, undefined, undefined, undefined, fillColor, 0.2)
-        this.horseState = state
-        this.index = index
+    constructor(scene: Phaser.Scene) {
+        super(scene, 0, 0, 'horse')
+        this.horseState = HorseState.Dead
+        this.index = 0
         scene.add.existing(this)
+    }
+
+    public joinTeam(teamKey: TeamKeys): void {
+        this.teamKey = teamKey
+        this.color = PlayerColors[teamKey]
     }
 
     public setHorseState(state: HorseState): void {
@@ -37,11 +42,11 @@ export default class Horse extends Phaser.GameObjects.Arc implements IHorse, ITe
         this.horseState = HorseState.Dead
     }
 
-    getTeamKey(): TeamKeys {
+    public getTeamKey(): TeamKeys {
         return this.teamKey
     }
 
-    getColor(): number {
+    public getColor(): number {
         return this.color
     }
 }

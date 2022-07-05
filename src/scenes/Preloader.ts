@@ -7,6 +7,7 @@ export default class Preloader extends Phaser.Scene {
   }
   preload() {
     this.load.image("player", "assets/game-objects/player.png");
+    this.load.image("horse", "assets/game-objects/horse.png");
     this.load.atlas(
       "dices",
       "assets/game-objects/dices.png",
