@@ -1,10 +1,12 @@
-import State from "../const/PlayerState"
+import TeamKeys from "../const/TeamKeys"
 
 interface ITeam {
+    teamKey: TeamKeys
+    color: number
+
     initTeam(): void
-    getTeamNumber(): number
+    getTeamKey(): TeamKeys
     getColor(): number
-    getState(): State
 }
 
 export default ITeam

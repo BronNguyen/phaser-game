@@ -1,9 +1,13 @@
 import PlayerColors from "../const/PlayerColors"
 import HorseState from "../const/HorseState"
 import IHorse from "../interface/IHorse"
+import ITeam from "../interface/ITeam"
+import TeamKeys from "../const/TeamKeys"
 
-export default class Horse extends Phaser.GameObjects.Arc implements IHorse {
-    horseState!: HorseState
+export default class Horse extends Phaser.GameObjects.Arc implements IHorse, ITeam {
+    horseState = HorseState.Dead
+    color!: number
+    teamKey = TeamKeys.Red
     currentPlace = 0
     index: number = 0
 
@@ -31,5 +35,17 @@ export default class Horse extends Phaser.GameObjects.Arc implements IHorse {
     public die(): void {
         this.currentPlace = 0
         this.horseState = HorseState.Dead
+    }
+
+    initTeam(): void {
+
+    }
+
+    getTeamKey(): TeamKeys {
+        return this.teamKey
+    }
+
+    getColor(): number {
+        return this.color
     }
 }

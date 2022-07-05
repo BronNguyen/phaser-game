@@ -1,4 +1,4 @@
-enum State {
+enum PlayerState {
     Init = 'init',
     Waiting = 'waiting',
     Dicing = 'dicing',
@@ -7,4 +7,4 @@ enum State {
     Lose = 'lose'
 }
 
-export default State;
+export default PlayerState;
