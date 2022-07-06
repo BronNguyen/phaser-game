@@ -208,11 +208,15 @@ export default class Battle extends Phaser.Scene {
 
         const diceState = this.processDices()
 
-        if(!aliveHorses.length && diceState === DiceState.Regular) {
-            this.gameTurnController.switchPlayer()
-            this.gameState = GameState.StartTurn
-        }
+        if(diceState === DiceState.Regular){
+            if(!aliveHorses.length) {
+                this.gameTurnController.switchPlayer()
+                this.gameState = GameState.StartTurn
+                return
+            }
 
+            //todo: waiting for horse chosing
+        }
 
 
         // const selectedHorse = this.horses.find((horse)=> horse.isChoosing)
@@ -290,7 +294,7 @@ export default class Battle extends Phaser.Scene {
         }
 
         if(this.gameState === GameState.HorseAction) {
-            
+
         }
 
         if(this.gameState === GameState.RollDice) {
