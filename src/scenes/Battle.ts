@@ -208,6 +208,10 @@ export default class Battle extends Phaser.Scene {
 
         const diceState = this.processDices()
 
+        if(diceState === DiceState.Double) {
+            this.events.emit('open-popup')
+        }
+
         if(diceState === DiceState.Regular){
             if(!aliveHorses.length) {
                 this.gameTurnController.switchPlayer()

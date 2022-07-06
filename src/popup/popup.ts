@@ -1,4 +1,4 @@
-import Phaser from "phaser"
+import Phaser, { Tilemaps } from "phaser"
 
 const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
@@ -30,8 +30,12 @@ export default class PopupContainer extends Phaser.GameObjects.Container{
         this.add(this.spawnText)
         this.add(this.moveText)
 
+        this.setVisible(false)
+        this.setActive(false)
+
         this.scene.add.existing(this)
         this.createBackground()
+        this.initOpenEvent()
     }
 
     drawPopup() {
@@ -83,6 +87,13 @@ export default class PopupContainer extends Phaser.GameObjects.Container{
     open() {
         this.drawBackground()
         this.drawPopup()
+
+        // this.moveText.setActive(true)
+        // this.spawnText.setActive(true)
+        // this.moveText.setVisible(true)
+        // this.spawnText.setVisible(true)
+        this.setVisible(true)
+        this.setActive(true)
 
         Phaser.Display.Align.In.LeftCenter(this.moveText, this)
         Phaser.Display.Align.In.RightCenter(this.spawnText, this, -90)
