@@ -6,6 +6,9 @@ interface IPlayerBehavior {
 
     setPlayerState(state: PlayerState): void
     getPlayerState(): PlayerState
+    increaseActionCount(count: number): void
+    decreaseActionCount(): void
+    getActionCount(): number
     pickHorse(horse: Horse): void
     rollDices(): number
 }

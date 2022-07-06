@@ -1,21 +1,24 @@
 import Phaser, { Tilemaps } from "phaser"
-import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory";
 import PluginName from "../const/Plugins";
 import SceneKeys from "../const/SceneKeys"
+import TeamKeys from "../const/TeamKeys";
+import GameState from "../const/GameState";
+import HorseState from "../const/HorseState";
+import DiceState from "../const/DiceState";
+import PlayerColors from "../const/PlayerColors";
+
+import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory";
+
 import Player from "../game-object/Player";
 import Territory from "../game-object/Territory";
-import TeamKeys from "../const/TeamKeys";
-import PlayerColors from "../const/PlayerColors";
 import Horse from "../game-object/Horse";
 import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
-import GameState from "../const/GameState";
 import GameTurnController from "../game-object/GameTurnController";
 import Dice from "../game-object/Dice";
+
 import DiceAnimation from "../animations/DiceAnimations";
-import DiceState from "../const/DiceState";
 import { uniq } from 'lodash'
-// import Territory from "../game-object/Territory";
 
 const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
@@ -117,7 +120,7 @@ export default class Battle extends Phaser.Scene {
 
         let territoryCount = 0
         this.territories.map((territory)=> {
-            if(territory.color) return
+            if(territory.getColor()) return
             if(++territoryCount > 14) return
 
             territory.index = territoryCount
@@ -133,7 +136,7 @@ export default class Battle extends Phaser.Scene {
         teamStart.coloring(this.graphics)
 
         const horseGroup = this.add.group({classType: Horse})
-        const teamHorses = Array(4).fill(undefined) as (Phaser.Geom.Rectangle | undefined) []
+        const teamHorses = Array(4).fill(undefined)
 
         teamHorses.map((_, index)=> {
             const horse = horseGroup.get()
@@ -174,6 +177,47 @@ export default class Battle extends Phaser.Scene {
         this.diceRectangle.on(GAMEOBJECT_POINTER_UP, this.rollDices, this)
     }
 
+    handleSpawnHorse() {
+        // if()
+        const player = this.gameTurnController.getCurrentPlayer()
+        const teamKey = player.getTeamKey()
+        const teamTerritory = this.territories.filter(ter=> ter.getTeamKey()=== teamKey)
+        const initiator = teamTerritory.find(ter => ter.isInitiator) as Territory
+
+        const horse = initiator.getHorse()
+        if(!horse) {
+            //TODO make decide UI
+            //TODO wait Choosing Horse
+            // initiator.setHorse()
+            // horse
+        }
+
+        // const horseTeamKey = horse.getTeamKey()
+        player.decreaseActionCount()
+    }
+
+    handlePlayerPreAction() {
+        const currentPlayer = this.gameTurnController.getCurrentPlayer()
+        const currentTeam = currentPlayer.getTeamKey()
+        const teamHorses = this.horses.filter(horse=> horse.getTeamKey()=== currentTeam)
+        const aliveHorses = teamHorses.filter(horse=> horse.horseState === HorseState.Idle)
+        const deadHorses = teamHorses.filter(horse => horse.horseState === HorseState.Dead)
+
+        const diceState = this.processDices()
+
+        if(!aliveHorses.length && diceState === DiceState.Regular) {
+            this.gameTurnController.switchPlayer()
+            this.gameState = GameState.StartTurn
+        }
+
+
+
+        // const selectedHorse = this.horses.find((horse)=> horse.isChoosing)
+        // if(selectedHorse) {
+        //     this.gameState = GameState.HorseAction
+        // }
+    }
+
     processDices() {
         let diceState = DiceState.Regular
 
@@ -204,8 +248,8 @@ export default class Battle extends Phaser.Scene {
             dice.setFace()
         })
 
-        this.processDices()
         this.gameState = GameState.SelectHorse
+        this.handlePlayerPreAction()
     }
 
     rollDices() {
@@ -222,7 +266,7 @@ export default class Battle extends Phaser.Scene {
         this.count++
 
         if(this.count > 100){
-            console.log(this.gameState)
+            console.log(this.gameState, this.gameTurnController.getCurrentPlayer().getTeamKey())
             this.count = 0
         }
 
@@ -237,15 +281,9 @@ export default class Battle extends Phaser.Scene {
         }
 
         if(this.gameState === GameState.SelectHorse){
-            const currentPlayer = this.gameTurnController.getCurrentPlayer()
-            const currentTeam = currentPlayer.getTeamKey()
-            // console.log('currentTeam: ', currentTeam)
 
-            // const availableHorse = this.
-            const selectedHorse = this.horses.find((horse)=> horse.isChoosing)
-            if(selectedHorse) {
-                this.gameState = GameState.HorseAction
-            }
+
+
         }
 
         if(this.gameState === GameState.HorseAction) {

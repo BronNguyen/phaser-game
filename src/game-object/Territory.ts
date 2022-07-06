@@ -8,7 +8,7 @@ import IShape from "../interface/IShape"
 
 export default class Territory extends Phaser.Geom.Circle implements ITeam, ILand, IShape {
     territoryState!: TerritoryState
-    color!: number
+    private color!: number
     private teamKey = TeamKeys.Red
     isInitiator = false
     horse!: Horse

@@ -10,7 +10,7 @@ const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
 export default class Horse extends Phaser.GameObjects.Image implements IHorse, ITeam {
     isChoosing = false
-    color!: number
+    private color!: number
     private teamKey = TeamKeys.Red
     horseState = HorseState.Dead
     currentPlace!: ILand
@@ -46,6 +46,10 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
 
     public getHorseState(): HorseState {
         return this.horseState
+    }
+
+    public spawn(): void {
+        this.horseState = HorseState.Idle
     }
 
     public moveTo(land: ILand): void {

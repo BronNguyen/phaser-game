@@ -4,7 +4,7 @@ import IShape from "../interface/IShape"
 import PlayerColors from "../const/PlayerColors"
 
 export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShape {
-    color!: number
+    private color!: number
     private teamKey = TeamKeys.Red
 
     constructor(x, y) {

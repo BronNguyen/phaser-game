@@ -6,8 +6,10 @@ import PlayerColors from "../const/PlayerColors"
 import Horse from "./Horse"
 
 export default class Player extends Phaser.GameObjects.Image implements IPlayerBehavior ,ITeam {
-    color!: number
     private teamKey = TeamKeys.Red
+    private actionCount = 0
+    private color!: number
+
     playerState = PlayerState.Init
     diceCount = 2
 
@@ -38,6 +40,18 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
 
     setPlayerState(state: PlayerState): void {
         this.playerState = state
+    }
+
+    getActionCount(): number {
+        return this.actionCount
+    }
+
+    decreaseActionCount(): void {
+        this.actionCount--
+    }
+
+    increaseActionCount(count: number): void {
+        this.actionCount += count
     }
 
     pickHorse(horse: Horse): void {
