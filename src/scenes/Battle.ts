@@ -20,6 +20,8 @@ import Dice from "../game-object/Dice";
 import DiceAnimation from "../animations/DiceAnimations";
 import { uniq } from 'lodash'
 
+import PopupContainer from "../popup/popup";
+
 const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
 export default class Battle extends Phaser.Scene {
@@ -103,6 +105,7 @@ export default class Battle extends Phaser.Scene {
 
         this.initiateObjects()
         this.initDiceSection()
+        const popup = new PopupContainer(this)
     }
 
     initiateObjects() {
