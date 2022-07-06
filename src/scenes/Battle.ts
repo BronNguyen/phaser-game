@@ -7,10 +7,15 @@ import Territory from "../game-object/Territory";
 import TeamKeys from "../const/TeamKeys";
 import PlayerColors from "../const/PlayerColors";
 import Horse from "../game-object/Horse";
+import Start from "../game-object/Start";
+import Finish from "../game-object/Finish";
 // import Territory from "../game-object/Territory";
 
 export default class Battle extends Phaser.Scene {
     cameraControl!: Phaser.Cameras.Controls.SmoothedKeyControl
+    playerGroup!: Phaser.GameObjects.Group
+    territories: Territory [] = []
+    graphics!: Phaser.GameObjects.Graphics
 
     constructor() {
         super(SceneKeys.Battle)
@@ -42,19 +47,10 @@ export default class Battle extends Phaser.Scene {
 
         this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig)
 
-        const group = this.make.group({
+        this.playerGroup = this.make.group({
             classType: Player,
-            gridAlign: {
-                x: 100,
-                y: 100,
-                width: 60,
-                height: 60,
-                cellWidth: 100,
-                cellHeight: 100
-            }
         })
 
-        // console.log('group: ', group)
         // const players = group.createMultiple({ classType: Player ,quantity: 4 });
         // console.log('players: ', players)
 
@@ -66,54 +62,57 @@ export default class Battle extends Phaser.Scene {
         // console.log('player2: ', player2)
         // console.log('playerGroup: ', playerGroup)
 
-        const player1 = new Player(this, 100, 100)
-        const player2 = new Player(this, 200, 100)
-        const player3 = new Player(this, 300, 100)
-        const player4 = new Player(this, 400, 100)
+        this.graphics = this.add.graphics()
 
-        const territoryGroup = this.add.group({classType: Territory})
-        const territories = Array(56).fill(undefined) as (Phaser.Geom.Circle | undefined) []
-        territories.map((_, index)=>{
-            let team = TeamKeys.Yellow
+        for(var x = 0; x < 14; x++)
+        {
+            for(var y = 0; y < 4; y++)
+            {
+                const territory  = new Territory(30 + x * 65, 30 + y * 65)
+                this.territories.push(territory);
+            }
+        }
 
-            if(index < 42) team = TeamKeys.Blue
-            if(index < 28) team = TeamKeys.Green
-            if(index < 14) team = TeamKeys.Red
+        this.initiateObjects()
+    }
 
-            const territory =  new Territory()
-            territoryGroup.add(territory)
-            return territory
+    initiateObjects() {
+        const teamKeys = Object.keys(TeamKeys);
+        teamKeys.forEach((teamKey) => {
+            this.initTeam(TeamKeys[teamKey])
+        });
+    }
+
+    initTeam(teamKey: TeamKeys) {
+        const player = new Player(this, 100, 100)
+        player.joinTeam(teamKey)
+        this.playerGroup.add(player)
+
+        let territoryCount = 0
+        const teamTerritories = this.territories.map((territory)=> {
+            if(++territoryCount > 14) return
+
+            territory.index = territoryCount
+
+            if(territory.index === 1) territory.isInitiator = true
+
+            territory.joinTeam(teamKey)
+            territory.coloring(this.graphics)
         })
+
+        const teamStart = new Start()
+        teamStart.joinTeam(teamKey)
 
         const horseGroup = this.add.group({classType: Horse})
-        const horses = Array(16).fill(undefined) as (Phaser.Geom.Rectangle | undefined) []
-        horses.map((_, index)=> {
-            let team = TeamKeys.Yellow
+        const teamHorses = Array(4).fill(undefined) as (Phaser.Geom.Rectangle | undefined) []
 
-            if(index < 42) team = TeamKeys.Blue
-            if(index < 28) team = TeamKeys.Green
-            if(index < 14) team = TeamKeys.Red
+        teamHorses.map(()=> {
+            const horse = new Horse(this)
+            horse.joinTeam(teamKey)
+            horseGroup.add(horse)
         })
 
-
-        Phaser.Actions.GridAlign(territoryGroup.getChildren(), { width: 14, cellWidth: 70, cellHeight: 70, x: 80, y: 80 })
     }
-
-    teamDivider(objectArray: Phaser.GameObjects.GameObject [],group: Phaser.GameObjects.Group, teamCount: number) {
-        objectArray.map((_, index)=>{
-            let team = TeamKeys.Yellow
-
-            if(index < 42) team = TeamKeys.Blue
-            if(index < 28) team = TeamKeys.Green
-            if(index < 14) team = TeamKeys.Red
-
-            const territory =  new Territory()
-            territoryGroup.add(territory)
-            return territory
-        })
-    }
-
-
 
     update (time, delta)
     {

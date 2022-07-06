@@ -1,13 +1,15 @@
 import TeamKeys from "../const/TeamKeys"
 import PlayerState from "../const/PlayerState"
 import ITeam from "../interface/ITeam"
-import IPlayer from "../interface/IPlayer"
+import IPlayerBehavior from "../interface/IPlayer"
 import PlayerColors from "../const/PlayerColors"
+import Horse from "./Horse"
 
-export default class Player extends Phaser.GameObjects.Image implements IPlayer ,ITeam , IRollDice {
+export default class Player extends Phaser.GameObjects.Image implements IPlayerBehavior ,ITeam , IRollDice {
     color!: number
     teamKey = TeamKeys.Red
     playerState = PlayerState.Init
+    diceCount = 2
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'player')
@@ -38,13 +40,23 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayer 
         this.playerState = state
     }
 
-    roll(diceCount: number): number {
+    pickHorse(horse: Horse): void {
+        horse.isChoosing = true
+    }
+
+    rollDices(): number {
         let stepCount = 0
-        for(let i = 0; i < diceCount; i++ ) {
+        for(let i = 0; i < this.diceCount; i++ ) {
             stepCount += Phaser.Math.Between(1, 6)
         }
 
         return stepCount
+    }
+
+    coloring(): void {
+        if(!this.color) return
+
+        this.setTintFill(this.color)
     }
 
     update(...args: any[]): void {

@@ -1,10 +1,13 @@
-import PlayerState from "const/PlayerState"
+import PlayerState from "../const/PlayerState"
+import Horse from "../game-object/Horse"
 
-interface IPlayer {
+interface IPlayerBehavior {
     playerState: PlayerState
 
     setPlayerState(state: PlayerState): void
     getPlayerState(): PlayerState
+    pickHorse(horse: Horse): void
+    rollDices(): number
 }
 
-export default IPlayer
+export default IPlayerBehavior

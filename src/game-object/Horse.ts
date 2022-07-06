@@ -3,12 +3,15 @@ import HorseState from "../const/HorseState"
 import IHorse from "../interface/IHorse"
 import ITeam from "../interface/ITeam"
 import TeamKeys from "../const/TeamKeys"
+import Territory from "./Territory"
+import ILand from "interface/ILand"
 
 export default class Horse extends Phaser.GameObjects.Image implements IHorse, ITeam {
-    horseState = HorseState.Dead
+    isChoosing = false
     color!: number
     teamKey = TeamKeys.Red
-    currentPlace = 0
+    horseState = HorseState.Dead
+    currentPlace!: ILand
     index: number = 0
 
     constructor(scene: Phaser.Scene) {
@@ -21,6 +24,8 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     public joinTeam(teamKey: TeamKeys): void {
         this.teamKey = teamKey
         this.color = PlayerColors[teamKey]
+        this.coloring()
+        this.horseState = HorseState.Dead
     }
 
     public setHorseState(state: HorseState): void {
@@ -31,14 +36,13 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         return this.horseState
     }
 
-    public move(count: number): void {
+    public moveTo(land: ILand): void {
         if(this.horseState === HorseState.Moving) {
-            this.currentPlace += count
+            this.currentPlace = land
         }
     }
 
     public die(): void {
-        this.currentPlace = 0
         this.horseState = HorseState.Dead
     }
 
@@ -48,5 +52,9 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
 
     public getColor(): number {
         return this.color
+    }
+
+    public coloring(): void {
+        this.setTint(this.color)
     }
 }
