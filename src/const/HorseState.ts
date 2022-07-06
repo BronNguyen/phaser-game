@@ -1,9 +1,10 @@
 enum HorseState  {
-    Dead = 'Dead',
-    Idle = 'Idle',
-    Sleep = 'Sleep',
-    Moving = 'Moving',
-    Power = 'Power',
+    Dead,
+    Idle,
+    Sleep,
+    Choosing,
+    Moving,
+    Power,
 }
 
 export default HorseState

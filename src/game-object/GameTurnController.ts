@@ -11,14 +11,16 @@ export default class GameTurnController {
     lastIndex = 0
     playerOrders: PlayerOrder = {}
 
-    constructor(scene: Battle, playerOrder: Player []) {
+    constructor(scene: Battle) {
         this.scene = scene
+        this.currentIndex = 1
+    }
+
+    setPlayerOrder(playerOrder: Player []) {
         playerOrder.forEach((player, index)=> {
             const turnNumber = index + 1
             this.playerOrders[turnNumber] = player
         })
-
-        this.currentIndex = 1
     }
 
     getCurrentPlayer() {
@@ -29,6 +31,5 @@ export default class GameTurnController {
         this.lastIndex = this.currentIndex
         this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 1 , 4)
     }
-
 
 }

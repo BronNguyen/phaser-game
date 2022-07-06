@@ -1,3 +1,0 @@
-interface IRollDice {
-    rollDices(): number
-}

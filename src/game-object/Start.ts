@@ -5,7 +5,7 @@ import PlayerColors from "../const/PlayerColors"
 
 export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShape {
     color!: number
-    teamKey = TeamKeys.Red
+    private teamKey = TeamKeys.Red
 
     constructor(x, y) {
         super(x, y, 100, 100)

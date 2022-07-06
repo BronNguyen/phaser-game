@@ -1,4 +1,7 @@
 enum DiceState {
-    Idle,
-    Rolling,
+    Double = 'Double',
+    OneSix = 'OneSix',
+    Regular = 'Regular'
 }
+
+export default DiceState

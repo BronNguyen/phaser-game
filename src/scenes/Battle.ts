@@ -1,4 +1,4 @@
-import Phaser from "phaser"
+import Phaser, { Tilemaps } from "phaser"
 import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory";
 import PluginName from "../const/Plugins";
 import SceneKeys from "../const/SceneKeys"
@@ -11,7 +11,13 @@ import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
 import GameState from "../const/GameState";
 import GameTurnController from "../game-object/GameTurnController";
+import Dice from "../game-object/Dice";
+import DiceAnimation from "../animations/DiceAnimations";
+import DiceState from "../const/DiceState";
+import { uniq } from 'lodash'
 // import Territory from "../game-object/Territory";
+
+const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
 export default class Battle extends Phaser.Scene {
     cameraControl!: Phaser.Cameras.Controls.SmoothedKeyControl
@@ -20,6 +26,12 @@ export default class Battle extends Phaser.Scene {
     gameTurnController!: GameTurnController
     gameState = GameState.Init
     territories: Territory [] = []
+    horses: Horse[] = []
+    diceGroup!: Phaser.GameObjects.Group
+    dices!: Dice []
+    diceRectangle!: Phaser.GameObjects.Rectangle
+
+    count = 0
 
     constructor() {
         super(SceneKeys.Battle)
@@ -34,6 +46,9 @@ export default class Battle extends Phaser.Scene {
     }
 
     create() {
+        const diceAnimationManager = new DiceAnimation(this)
+        diceAnimationManager.createRollDiceAnimation()
+
         const cursors = this.input.keyboard.createCursorKeys()
 
         const controlConfig = {
@@ -53,6 +68,11 @@ export default class Battle extends Phaser.Scene {
 
         this.playerGroup = this.make.group({
             classType: Player,
+            runChildUpdate: true,
+        })
+
+        this.diceGroup = this.add.group({
+            classType: Dice,
         })
 
         // const players = group.createMultiple({ classType: Player ,quantity: 4 });
@@ -67,6 +87,7 @@ export default class Battle extends Phaser.Scene {
         // console.log('playerGroup: ', playerGroup)
 
         this.graphics = this.add.graphics()
+        this.gameTurnController = new GameTurnController(this)
 
         for(var y = 0; y < 4; y++)
         {
@@ -78,6 +99,7 @@ export default class Battle extends Phaser.Scene {
         }
 
         this.initiateObjects()
+        this.initDiceSection()
     }
 
     initiateObjects() {
@@ -117,13 +139,14 @@ export default class Battle extends Phaser.Scene {
             const horse = horseGroup.get()
             horse.joinTeam(teamKey)
             horse.setPosition(40 * (index % 2) + 30 + teamStart.left,40 * (index % 2) + 30 + teamStart.top)
+            this.horses.push(horse)
         })
     }
 
     startGame() {
-        this.gameState= GameState.Start
+        this.gameState = GameState.StartTurn
         const sortedPlayers = this.setTeamOrder() as Player []
-        this.gameTurnController = new GameTurnController(this, sortedPlayers)
+        this.gameTurnController.setPlayerOrder(sortedPlayers)
     }
 
     setTeamOrder() {
@@ -132,11 +155,111 @@ export default class Battle extends Phaser.Scene {
         return players
     }
 
+    initDiceSection () {
+        this.diceRectangle = this.add.rectangle(650, 450, 300, 300, 0x000000, 0.1)
+
+        this.diceGroup.create()
+        this.diceGroup.create()
+
+        this.dices = this.diceGroup.getChildren() as Dice[]
+        const { x, y } = this.diceRectangle
+
+        this.dices.map((dice: Dice, index)=> {
+            dice.setPosition(x + index * 130 - 75, y)
+            // dice.play('roll')
+            // dice
+        })
+
+        this.diceRectangle.setInteractive()
+        this.diceRectangle.on(GAMEOBJECT_POINTER_UP, this.rollDices, this)
+    }
+
+    processDices() {
+        let diceState = DiceState.Regular
+
+        if(this.checkDouble()) diceState = DiceState.Double
+
+        if(this.checkOneSix()) diceState = DiceState.OneSix
+
+        return diceState
+    }
+
+    checkOneSix() {
+        const sixDice = this.dices.find(dice=>dice.face === 6)
+        const oneDice = this.dices.find(dice=> dice.face === 1)
+
+        return sixDice && oneDice
+    }
+
+    checkDouble() {
+        const faceArray = this.dices.map(dice=> dice.face)
+        if(uniq(faceArray).length !== faceArray.length) return true
+        return false
+    }
+
+    getDiceFaces() {
+        this.dices.map(dice=>{
+            dice.roll()
+            dice.stop()
+            dice.setFace()
+        })
+
+        this.processDices()
+        this.gameState = GameState.SelectHorse
+    }
+
+    rollDices() {
+        if(this.gameState === GameState.StartTurn){
+            this.dices.map((dice)=> {
+                dice.play('roll')
+            })
+            this.gameState = GameState.RollDice
+        }
+    }
+
 
     update(time, delta) {
+        this.count++
+
+        if(this.count > 100){
+            console.log(this.gameState)
+            this.count = 0
+        }
+
+        this.cameraControl.update(delta)
+
         if(this.gameState === GameState.Init) {
             this.startGame()
         }
-        this.cameraControl.update(delta)
+
+        if(this.gameState === GameState.StartTurn) {
+            return
+        }
+
+        if(this.gameState === GameState.SelectHorse){
+            const currentPlayer = this.gameTurnController.getCurrentPlayer()
+            const currentTeam = currentPlayer.getTeamKey()
+            // console.log('currentTeam: ', currentTeam)
+
+            // const availableHorse = this.
+            const selectedHorse = this.horses.find((horse)=> horse.isChoosing)
+            if(selectedHorse) {
+                this.gameState = GameState.HorseAction
+            }
+        }
+
+        if(this.gameState === GameState.HorseAction) {
+            
+        }
+
+        if(this.gameState === GameState.RollDice) {
+            this.gameState = GameState.Rolling
+            this.time.delayedCall(2000 ,this.getDiceFaces ,[] ,this);
+        }
+
+        if(this.gameState === GameState.Rolling) {
+            return
+            // this.time
+        }
     }
 }

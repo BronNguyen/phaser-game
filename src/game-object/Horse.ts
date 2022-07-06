@@ -6,10 +6,12 @@ import TeamKeys from "../const/TeamKeys"
 import Territory from "./Territory"
 import ILand from "interface/ILand"
 
+const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
+
 export default class Horse extends Phaser.GameObjects.Image implements IHorse, ITeam {
     isChoosing = false
     color!: number
-    teamKey = TeamKeys.Red
+    private teamKey = TeamKeys.Red
     horseState = HorseState.Dead
     currentPlace!: ILand
     index: number = 0
@@ -18,7 +20,9 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         super(scene, 0, 0, 'horse')
         this.horseState = HorseState.Dead
         this.index = 0
+        this.setInteractive()
         scene.add.existing(this)
+        this.initClickEvent()
     }
 
     public joinTeam(teamKey: TeamKeys): void {
@@ -26,6 +30,14 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         this.color = PlayerColors[teamKey]
         this.coloring()
         this.horseState = HorseState.Dead
+    }
+
+    public initClickEvent() {
+        this.on(GAMEOBJECT_POINTER_UP, this.setChoosing)
+    }
+
+    private setChoosing() {
+        this.isChoosing = true
     }
 
     public setHorseState(state: HorseState): void {
@@ -37,10 +49,13 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     }
 
     public moveTo(land: ILand): void {
-        if(this.horseState === HorseState.Moving) {
-            this.currentPlace = land
-            land.setHorse(this)
-        }
+        if(!this.isChoosing) return
+
+        this.horseState = HorseState.Moving
+        this.currentPlace = land
+        land.setHorse(this)
+        this.horseState = HorseState.Idle
+        this.isChoosing = false
     }
 
     public die(): void {

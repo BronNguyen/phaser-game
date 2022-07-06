@@ -1,13 +1,13 @@
 import TeamKeys from "../const/TeamKeys"
 import PlayerState from "../const/PlayerState"
 import ITeam from "../interface/ITeam"
-import IPlayerBehavior from "../interface/IPlayer"
+import IPlayerBehavior from "../interface/IPlayerBehavior"
 import PlayerColors from "../const/PlayerColors"
 import Horse from "./Horse"
 
-export default class Player extends Phaser.GameObjects.Image implements IPlayerBehavior ,ITeam , IRollDice {
+export default class Player extends Phaser.GameObjects.Image implements IPlayerBehavior ,ITeam {
     color!: number
-    teamKey = TeamKeys.Red
+    private teamKey = TeamKeys.Red
     playerState = PlayerState.Init
     diceCount = 2
 
@@ -59,6 +59,7 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
         this.setTintFill(this.color)
     }
 
-    update(...args: any[]): void {
+    update(): void {
+        super.update()
     }
 }
