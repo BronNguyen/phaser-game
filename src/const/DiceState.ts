@@ -1,0 +1,4 @@
+enum DiceState {
+    Idle,
+    Rolling,
+}

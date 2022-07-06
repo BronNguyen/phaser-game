@@ -5,8 +5,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   mode: "development", // could be "production" as well
-  entry: './src/index.ts',
-  mode: 'development',
+  entry: "./src/index.ts",
+  mode: "development",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "app.js",
@@ -15,7 +15,7 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"]
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.js$/,
@@ -27,38 +27,36 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
       {
         test: /\.(?:ico|gif|png|jpg|ttf|m4a|jpeg)$/i,
-        type: 'asset/resource',
+        type: "asset/resource",
       },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: [".tsx", ".ts", ".js"],
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    contentBase: path.join(__dirname, "dist"),
     compress: true,
-    port: 8080,
+    port: 9000,
   },
   plugins: [
     new CleanWebpackPlugin({
-      root: path.resolve(__dirname, "../")
+      root: path.resolve(__dirname, "../"),
     }),
     new HtmlWebpackPlugin({
       title: "Game Loop Researching",
-      template: "./src/index.html"
+      template: "./src/index.html",
     }),
     new CopyPlugin({
-      patterns: [
-        { from: "assets", to: "assets" },
-      ],
+      patterns: [{ from: "assets", to: "assets" }],
       options: {
         concurrency: 100,
       },
     }),
-  ]
+  ],
 };
