@@ -9,13 +9,17 @@ import PlayerColors from "../const/PlayerColors";
 import Horse from "../game-object/Horse";
 import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
+import GameState from "../const/GameState";
+import GameTurnController from "../game-object/GameTurnController";
 // import Territory from "../game-object/Territory";
 
 export default class Battle extends Phaser.Scene {
     cameraControl!: Phaser.Cameras.Controls.SmoothedKeyControl
     playerGroup!: Phaser.GameObjects.Group
-    territories: Territory [] = []
     graphics!: Phaser.GameObjects.Graphics
+    gameTurnController!: GameTurnController
+    gameState = GameState.Init
+    territories: Territory [] = []
 
     constructor() {
         super(SceneKeys.Battle)
@@ -84,9 +88,10 @@ export default class Battle extends Phaser.Scene {
     }
 
     initTeam(teamKey: TeamKeys, teamIndex) {
-        const player = new Player(this, 100, 100)
+        const player = this.playerGroup.create()
+        player.setActive(false)
+        player.setVisible(false)
         player.joinTeam(teamKey)
-        this.playerGroup.add(player)
 
         let territoryCount = 0
         this.territories.map((territory)=> {
@@ -109,15 +114,29 @@ export default class Battle extends Phaser.Scene {
         const teamHorses = Array(4).fill(undefined) as (Phaser.Geom.Rectangle | undefined) []
 
         teamHorses.map((_, index)=> {
-            const horse = new Horse(this)
+            const horse = horseGroup.get()
             horse.joinTeam(teamKey)
             horse.setPosition(40 * (index % 2) + 30 + teamStart.left,40 * (index % 2) + 30 + teamStart.top)
-            horseGroup.add(horse)
         })
     }
 
-    update (time, delta)
-    {
+    startGame() {
+        this.gameState= GameState.Start
+        const sortedPlayers = this.setTeamOrder() as Player []
+        this.gameTurnController = new GameTurnController(this, sortedPlayers)
+    }
+
+    setTeamOrder() {
+        const players = this.playerGroup.getChildren()
+        players.sort(()=>(Phaser.Math.Between(1,4)-Phaser.Math.Between(1,4)))
+        return players
+    }
+
+
+    update(time, delta) {
+        if(this.gameState === GameState.Init) {
+            this.startGame()
+        }
         this.cameraControl.update(delta)
     }
 }

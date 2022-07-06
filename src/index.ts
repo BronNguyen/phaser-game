@@ -25,7 +25,7 @@ const config: Phaser.Types.Core.GameConfig = {
     //         { key: PluginName.PlayerPlugin, plugin: PlayerPlugin, start: true }
     //     ]
     // },
-	scene: [Preloader, Battle, Example,Fruit, Smoke, ]
+	scene: [Preloader, Battle, Example,Fruit, Smoke]
 }
 
 export default new Phaser.Game(config)

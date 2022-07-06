@@ -39,6 +39,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     public moveTo(land: ILand): void {
         if(this.horseState === HorseState.Moving) {
             this.currentPlace = land
+            land.setHorse(this)
         }
     }
 
