@@ -64,9 +64,9 @@ export default class Battle extends Phaser.Scene {
 
         this.graphics = this.add.graphics()
 
-        for(var x = 0; x < 14; x++)
+        for(var y = 0; y < 4; y++)
         {
-            for(var y = 0; y < 4; y++)
+            for(var x = 0; x < 14; x++)
             {
                 const territory  = new Territory(30 + x * 65, 30 + y * 65)
                 this.territories.push(territory);
@@ -78,18 +78,19 @@ export default class Battle extends Phaser.Scene {
 
     initiateObjects() {
         const teamKeys = Object.keys(TeamKeys);
-        teamKeys.forEach((teamKey) => {
-            this.initTeam(TeamKeys[teamKey])
+        teamKeys.forEach((teamKey, index) => {
+            this.initTeam(TeamKeys[teamKey], index)
         });
     }
 
-    initTeam(teamKey: TeamKeys) {
+    initTeam(teamKey: TeamKeys, teamIndex) {
         const player = new Player(this, 100, 100)
         player.joinTeam(teamKey)
         this.playerGroup.add(player)
 
         let territoryCount = 0
-        const teamTerritories = this.territories.map((territory)=> {
+        this.territories.map((territory)=> {
+            if(territory.color) return
             if(++territoryCount > 14) return
 
             territory.index = territoryCount
@@ -100,18 +101,19 @@ export default class Battle extends Phaser.Scene {
             territory.coloring(this.graphics)
         })
 
-        const teamStart = new Start()
+        const teamStart = new Start(20 + teamIndex * 110, 300)
         teamStart.joinTeam(teamKey)
+        teamStart.coloring(this.graphics)
 
         const horseGroup = this.add.group({classType: Horse})
         const teamHorses = Array(4).fill(undefined) as (Phaser.Geom.Rectangle | undefined) []
 
-        teamHorses.map(()=> {
+        teamHorses.map((_, index)=> {
             const horse = new Horse(this)
             horse.joinTeam(teamKey)
+            horse.setPosition(40 * (index % 2) + 30 + teamStart.left,40 * (index % 2) + 30 + teamStart.top)
             horseGroup.add(horse)
         })
-
     }
 
     update (time, delta)

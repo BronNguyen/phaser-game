@@ -47,7 +47,7 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     }
 
     public coloring(graphics: Phaser.GameObjects.Graphics): void {
-        graphics.fillStyle(this.color, 0.2)
+        graphics.fillStyle(this.color, 0.3)
         graphics.fillCircleShape(this)
     }
 }

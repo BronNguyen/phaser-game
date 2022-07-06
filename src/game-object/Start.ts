@@ -1,18 +1,21 @@
 import ITeam from "../interface/ITeam"
 import TeamKeys from "../const/TeamKeys"
 import IShape from "../interface/IShape"
+import PlayerColors from "../const/PlayerColors"
 
 export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShape {
     color!: number
     teamKey = TeamKeys.Red
 
-    constructor() {
-        super(0, 0, 100, 100)
+    constructor(x, y) {
+        super(x, y, 100, 100)
     }
 
     joinTeam(teamKey: TeamKeys): void {
         this.teamKey = teamKey
+        this.color = PlayerColors[teamKey]
     }
+
     getTeamKey(): TeamKeys {
         return this.teamKey
     }
@@ -22,7 +25,7 @@ export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShap
     }
 
     coloring(graphics: Phaser.GameObjects.Graphics): void {
-        graphics.fillStyle(this.color, 0.2)
+        graphics.fillStyle(this.color, 0.3)
         graphics.fillRectShape(this)
     }
 }

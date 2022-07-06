@@ -14,7 +14,7 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'player')
         this.setScale(0.3)
-        scene.add.existing(this)
+        // scene.add.existing(this)
     }
 
     getTeamKey(): TeamKeys {
@@ -29,7 +29,7 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
     joinTeam(teamKey: TeamKeys): void {
         this.teamKey = teamKey
         this.color = PlayerColors[teamKey]
-        this.setTintFill(this.color)
+        this.setTint(this.color)
     }
 
     getPlayerState(): PlayerState {
