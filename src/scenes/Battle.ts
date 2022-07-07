@@ -16,6 +16,8 @@ import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
 import Dice from "../game-object/Dice";
 
+import { shuffle } from 'lodash'
+
 import GameTurnController from "../controller/GameTurnController";
 import DiceController from "../controller/DiceController";
 import HorseController from "../controller/HorseController";
@@ -36,7 +38,7 @@ export default class Battle extends Phaser.Scene {
     horseController!: HorseController
     territoryController!: TerritoryController
     horseAnimationManager!: HorseAnimation
-    gameState = GameState.Init
+    gameState = GameState.Start
     horses: Horse[] = []
     dices!: Dice []
     diceRectangle!: Phaser.GameObjects.Rectangle
@@ -109,37 +111,26 @@ export default class Battle extends Phaser.Scene {
     }
 
     startGame() {
-        this.gameState = GameState.Start
-        const sortedPlayers = this.setTeamOrder() as Player []
+        this.gameState = GameState.SwitchPlayer
+        const players = this.playerGroup.getChildren()
+        const sortedPlayers = shuffle(players)
         this.gameTurnController.setPlayerOrder(sortedPlayers)
     }
 
-    setTeamOrder() {
-        const players = this.playerGroup.getChildren()
-        players.sort(()=>(Phaser.Math.Between(1,4)-Phaser.Math.Between(1,4)))
-        return players
-    }
 
-    update(time, delta) {
+    update() {
         this.count++
 
         const currentPlayer = this.gameTurnController.getCurrentPlayer()
         const currentTeam = currentPlayer?.getTeamKey()
         if(this.count > 100){
-            console.log(this.gameState, currentTeam, this.currentPlayer.playerState)
-            console.log('this.diceController.diceState: ', this.diceController.diceState)
+            console.log(this.gameState, currentTeam)
 
             this.count = 0
         }
 
-        if(this.gameState === GameState.Init) {
-            this.startGame()
-        }
-
         if(this.gameState === GameState.Start) {
-            //reset all players state
-            this.gameTurnController.resetAllPlayersState()
-            this.gameState = GameState.SwitchPlayer
+            this.startGame()
         }
 
         if(this.gameState === GameState.SwitchPlayer) {
@@ -177,6 +168,7 @@ export default class Battle extends Phaser.Scene {
 
 
             if(diceResult === DiceResult.Double) {
+                //todo: bug action count too much
                 this.gameTurnController.addActionCount()
                 availableHorses = this.horseController.getTeamHorses(currentTeam)
                 //todo set finish rank up available

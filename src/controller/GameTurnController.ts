@@ -14,7 +14,6 @@ export default class GameTurnController {
 
     constructor(scene: Battle) {
         this.scene = scene
-        this.currentIndex = 1
     }
 
     resetAllPlayersState(): void {
@@ -35,8 +34,7 @@ export default class GameTurnController {
 
     setPlayerOrder(playerOrder: Player []) {
         playerOrder.forEach((player, index)=> {
-            const turnNumber = index + 1
-            this.playerOrders[turnNumber] = player
+            this.playerOrders[index] = player
         })
     }
 
@@ -46,16 +44,16 @@ export default class GameTurnController {
 
     switchPlayer(): void {
         this.lastIndex = this.currentIndex
-        this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 1 , 4)
+        this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 0 , 3)
+        console.log('this.currentIndex: ', this.currentIndex)
         const player = this.getCurrentPlayer()
-        // player.setPlayerState(PlayerState.StartTurn)
+        console.log('player: ', player)
     }
 
     processPlayerStartTurn(): boolean {
         const player = this.getCurrentPlayer()
         const actionCount = player?.getActionCount()
         console.log('actionCount: ', actionCount)
-        // const isInRollingState = player.playerState === PlayerState.Rolling
 
         if(player && actionCount > 0) {
             return true

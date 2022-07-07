@@ -1,5 +1,4 @@
 enum GameState {
-    Init = 'Init',
     Start = 'Start',
     SwitchPlayer = 'SwitchPlayer',
     StartPlayerTurn = 'StartPlayerTurn',
