@@ -35,6 +35,7 @@ export default class Battle extends Phaser.Scene {
     diceGroup!: Phaser.GameObjects.Group
     dices!: Dice []
     diceRectangle!: Phaser.GameObjects.Rectangle
+    currentPlayer!: Player
 
     count = 0
 
@@ -150,7 +151,7 @@ export default class Battle extends Phaser.Scene {
     }
 
     startGame() {
-        this.gameState = GameState.StartTurn
+        this.gameState = GameState.Start
         const sortedPlayers = this.setTeamOrder() as Player []
         this.gameTurnController.setPlayerOrder(sortedPlayers)
     }
@@ -177,7 +178,13 @@ export default class Battle extends Phaser.Scene {
         })
 
         this.diceRectangle.setInteractive()
-        this.diceRectangle.on(GAMEOBJECT_POINTER_UP, this.rollDices, this)
+        this.diceRectangle.on(GAMEOBJECT_POINTER_UP, this.handleRollingDice, this)
+    }
+
+    handleRollingDice() {
+        if(this.gameTurnController.processPlayerRollingDice()) {
+            this.events.emit('roll-dices')
+        }
     }
 
     handleSpawnHorse() {
@@ -215,7 +222,7 @@ export default class Battle extends Phaser.Scene {
         if(diceState === DiceState.Regular){
             if(!aliveHorses.length) {
                 this.gameTurnController.switchPlayer()
-                this.gameState = GameState.StartTurn
+                // this.gameState = GameState.Start
                 return
             }
 
@@ -263,21 +270,13 @@ export default class Battle extends Phaser.Scene {
         this.handlePlayerPreAction()
     }
 
-    rollDices() {
-        if(this.gameState === GameState.StartTurn){
-            this.dices.map((dice)=> {
-                dice.play('roll')
-            })
-            this.gameState = GameState.RollDice
-        }
-    }
-
-
     update(time, delta) {
         this.count++
 
+        const currentPlayer = this.gameTurnController.getCurrentPlayer()
+        const currentTeam = currentPlayer?.getTeamKey()
         if(this.count > 100){
-            console.log(this.gameState, this.gameTurnController.getCurrentPlayer().getTeamKey())
+            console.log(this.gameState, currentTeam)
             this.count = 0
         }
 
@@ -287,23 +286,35 @@ export default class Battle extends Phaser.Scene {
             this.startGame()
         }
 
-        if(this.gameState === GameState.StartTurn) {
+        if(this.gameState === GameState.Start) {
+            //reset all players state
+            this.gameTurnController.resetAllPlayersState()
+            this.gameState = GameState.SwitchPlayer
+        }
+
+        if(this.gameState === GameState.SwitchPlayer) {
+            if(this.currentPlayer) {
+                this.gameTurnController.switchPlayer()
+            }
+
+            this.currentPlayer = this.gameTurnController.getCurrentPlayer()
+            this.gameTurnController.addActionCount(this.currentPlayer)
+            this.gameState = GameState.PlayerTurn
+        }
+
+        if(this.gameState === GameState.PlayerTurn) {
+            this.currentPlayer.playTurn()
             return
         }
 
-        if(this.gameState === GameState.SelectHorse){
-
+        if(this.gameState === GameState.SelectHorse) {
+            
 
 
         }
 
         if(this.gameState === GameState.HorseAction) {
 
-        }
-
-        if(this.gameState === GameState.RollDice) {
-            this.gameState = GameState.Rolling
-            this.time.delayedCall(2000 ,this.getDiceFaces ,[] ,this);
         }
 
         if(this.gameState === GameState.Rolling) {

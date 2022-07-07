@@ -10,7 +10,7 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
     private actionCount = 0
     private color!: number
 
-    playerState = PlayerState.Init
+    playerState = PlayerState.Waiting
     diceCount = 2
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -35,7 +35,7 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
     }
 
     getPlayerState(): PlayerState {
-        return PlayerState.Init
+        return PlayerState.Waiting
     }
 
     setPlayerState(state: PlayerState): void {
@@ -50,12 +50,15 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
         this.actionCount--
     }
 
-    increaseActionCount(count: number): void {
-        this.actionCount += count
+    increaseActionCount(quantity: number): void {
+        this.actionCount += quantity
     }
 
     pickHorse(horse: Horse): void {
         horse.isChoosing = true
+    }
+
+    playTurn(): void {
     }
 
     rollDices(): number {

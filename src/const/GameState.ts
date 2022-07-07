@@ -1,6 +1,8 @@
 enum GameState {
     Init = 'Init',
-    StartTurn = 'StartTurn',
+    Start = 'Start',
+    PlayerTurn = 'PlayerTurn',
+    SwitchPlayer = 'SwitchPlayer',
     RollDice = 'RollDice',
     Rolling = 'Rolling',
     SelectHorse = 'SelectHorse',

@@ -1,10 +1,11 @@
 enum PlayerState {
-    Init = 'init',
-    Waiting = 'waiting',
-    Dicing = 'dicing',
-    Moving = 'moving',
-    Win = 'win',
-    Lose = 'lose'
+    Waiting = 'Waiting',
+    StartTurn = 'StartTurn',
+    Rolling = 'Rolling',
+    Moving = 'Moving',
+    EndTurn = 'EndTurn',
+    Win = 'Win',
+    Lose = 'Lose'
 }
 
 export default PlayerState;
