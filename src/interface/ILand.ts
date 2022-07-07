@@ -7,6 +7,7 @@ interface ILand {
     setHorse(horse: Horse): void
     getHorse(): Horse | null
     getIndex(): number
+    getPosition(): {x: number, y: number}
 }
 
 export default ILand

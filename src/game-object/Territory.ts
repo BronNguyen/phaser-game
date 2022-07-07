@@ -43,6 +43,12 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
         return this.horse
     }
 
+    public getPosition(): { x: number; y: number; } {
+        const x = this.x
+        const y = this.y
+        return {x, y}
+    }
+
     public getIndex(): number {
         return this.index
     }
