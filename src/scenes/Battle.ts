@@ -21,6 +21,7 @@ import DiceAnimation from "../animations/DiceAnimations";
 import { uniq } from 'lodash'
 
 import PopupContainer from "../popup/popup";
+import PlayerState from "../const/PlayerState";
 
 const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
@@ -276,7 +277,7 @@ export default class Battle extends Phaser.Scene {
         const currentPlayer = this.gameTurnController.getCurrentPlayer()
         const currentTeam = currentPlayer?.getTeamKey()
         if(this.count > 100){
-            console.log(this.gameState, currentTeam)
+            console.log(this.gameState, currentTeam, this.currentPlayer.playerState)
             this.count = 0
         }
 
@@ -300,7 +301,8 @@ export default class Battle extends Phaser.Scene {
             this.currentPlayer = this.gameTurnController.getCurrentPlayer()
             this.gameTurnController.addActionCount(this.currentPlayer)
             this.gameState = GameState.PlayerTurn
-        }
+            this.currentPlayer.setPlayerState(PlayerState.StartTurn)
+    }
 
         if(this.gameState === GameState.PlayerTurn) {
             this.currentPlayer.playTurn()

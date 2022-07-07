@@ -10,7 +10,7 @@ interface IPlayerBehavior {
     decreaseActionCount(): void
     getActionCount(): number
     pickHorse(horse: Horse): void
-    rollDices(): number
+    rollDices(): void
 }
 
 export default IPlayerBehavior

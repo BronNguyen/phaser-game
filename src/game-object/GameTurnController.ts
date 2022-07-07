@@ -42,7 +42,7 @@ export default class GameTurnController {
         this.lastIndex = this.currentIndex
         this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 1 , 4)
         const player = this.getCurrentPlayer()
-        player.setPlayerState(PlayerState.StartTurn)
+        // player.setPlayerState(PlayerState.StartTurn)
     }
 
     processPlayerRollingDice(): boolean {

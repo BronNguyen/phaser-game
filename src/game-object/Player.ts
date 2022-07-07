@@ -59,15 +59,13 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
     }
 
     playTurn(): void {
+        if(this.playerState === PlayerState.StartTurn) {
+            this.rollDices()
+        }
     }
 
-    rollDices(): number {
-        let stepCount = 0
-        for(let i = 0; i < this.diceCount; i++ ) {
-            stepCount += Phaser.Math.Between(1, 6)
-        }
-
-        return stepCount
+    rollDices(): void {
+        this.playerState = PlayerState.Rolling
     }
 
     coloring(): void {
