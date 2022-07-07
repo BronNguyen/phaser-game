@@ -2,7 +2,6 @@ export default class Dice extends Phaser.GameObjects.Sprite {
     face = 1
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'dices', '1')
-        this.initEvents()
     }
 
     setFace(){
@@ -15,8 +14,6 @@ export default class Dice extends Phaser.GameObjects.Sprite {
 
     playRollAnimation() {
         this.play('roll')
-
-        this.scene.time.delayedCall(1500 ,this.stopRollAnimation ,[] , this);
     }
 
     stopRollAnimation() {
@@ -24,9 +21,4 @@ export default class Dice extends Phaser.GameObjects.Sprite {
         this.stop()
         this.setFace()
     }
-
-    initEvents() {
-        this.scene.events.on('roll-dices', this.playRollAnimation, this)
-    }
-
 }

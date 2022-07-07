@@ -4,7 +4,7 @@ import SceneKeys from "../const/SceneKeys"
 import TeamKeys from "../const/TeamKeys";
 import GameState from "../const/GameState";
 import HorseState from "../const/HorseState";
-import DiceState from "../const/DiceState";
+import DiceResult from "../const/DiceResult";
 import PlayerColors from "../const/PlayerColors";
 
 import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory";
@@ -14,26 +14,28 @@ import Territory from "../game-object/Territory";
 import Horse from "../game-object/Horse";
 import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
-import GameTurnController from "../game-object/GameTurnController";
 import Dice from "../game-object/Dice";
+
+import GameTurnController from "../controller/GameTurnController";
+import DiceController from "../controller/DiceController";
+import HorseController from "../controller/HorseController";
 
 import DiceAnimation from "../animations/DiceAnimations";
 import { uniq } from 'lodash'
 
 import PopupContainer from "../popup/popup";
 import PlayerState from "../const/PlayerState";
-
-const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
+import DiceState from "../const/DiceState";
 
 export default class Battle extends Phaser.Scene {
-    cameraControl!: Phaser.Cameras.Controls.SmoothedKeyControl
     playerGroup!: Phaser.GameObjects.Group
     graphics!: Phaser.GameObjects.Graphics
     gameTurnController!: GameTurnController
+    diceController!: DiceController
+    horseController!: HorseController
     gameState = GameState.Init
     territories: Territory [] = []
     horses: Horse[] = []
-    diceGroup!: Phaser.GameObjects.Group
     dices!: Dice []
     diceRectangle!: Phaser.GameObjects.Rectangle
     currentPlayer!: Player
@@ -53,34 +55,17 @@ export default class Battle extends Phaser.Scene {
     }
 
     create() {
+        const popup = new PopupContainer(this)
         const diceAnimationManager = new DiceAnimation(this)
-        diceAnimationManager.createRollDiceAnimation()
+        this.initiateControllers()
 
         const cursors = this.input.keyboard.createCursorKeys()
-
-        const controlConfig = {
-            camera: this.cameras.main,
-            left: cursors.left,
-            right: cursors.right,
-            up: cursors.up,
-            down: cursors.down,
-            zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q),
-            zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
-            acceleration: 0.35,
-            drag: 0.01,
-            maxSpeed: 1.0
-        }
-
-        this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig)
 
         this.playerGroup = this.make.group({
             classType: Player,
             runChildUpdate: true,
         })
 
-        this.diceGroup = this.add.group({
-            classType: Dice,
-        })
 
         // const players = group.createMultiple({ classType: Player ,quantity: 4 });
         // console.log('players: ', players)
@@ -106,8 +91,11 @@ export default class Battle extends Phaser.Scene {
         }
 
         this.initiateObjects()
-        this.initDiceSection()
-        const popup = new PopupContainer(this)
+    }
+
+    initiateControllers() {
+        this.diceController = new DiceController(this)
+        this.horseController = new HorseController(this)
     }
 
     initiateObjects() {
@@ -140,15 +128,7 @@ export default class Battle extends Phaser.Scene {
         teamStart.joinTeam(teamKey)
         teamStart.coloring(this.graphics)
 
-        const horseGroup = this.add.group({classType: Horse})
-        const teamHorses = Array(4).fill(undefined)
-
-        teamHorses.map((_, index)=> {
-            const horse = horseGroup.get()
-            horse.joinTeam(teamKey)
-            horse.setPosition(40 * (index % 2) + 30 + teamStart.left,40 * (index % 2) + 30 + teamStart.top)
-            this.horses.push(horse)
-        })
+        this.horseController.initTeamHorse(teamKey, teamStart)
     }
 
     startGame() {
@@ -161,31 +141,6 @@ export default class Battle extends Phaser.Scene {
         const players = this.playerGroup.getChildren()
         players.sort(()=>(Phaser.Math.Between(1,4)-Phaser.Math.Between(1,4)))
         return players
-    }
-
-    initDiceSection () {
-        this.diceRectangle = this.add.rectangle(650, 450, 300, 300, 0x000000, 0.1)
-
-        this.diceGroup.create()
-        this.diceGroup.create()
-
-        this.dices = this.diceGroup.getChildren() as Dice[]
-        const { x, y } = this.diceRectangle
-
-        this.dices.map((dice: Dice, index)=> {
-            dice.setPosition(x + index * 130 - 75, y)
-            // dice.play('roll')
-            // dice
-        })
-
-        this.diceRectangle.setInteractive()
-        this.diceRectangle.on(GAMEOBJECT_POINTER_UP, this.handleRollingDice, this)
-    }
-
-    handleRollingDice() {
-        if(this.gameTurnController.processPlayerRollingDice()) {
-            this.events.emit('roll-dices')
-        }
     }
 
     handleSpawnHorse() {
@@ -204,72 +159,19 @@ export default class Battle extends Phaser.Scene {
         }
 
         // const horseTeamKey = horse.getTeamKey()
-        player.decreaseActionCount()
+        // player.decreaseActionCount()
     }
 
     handlePlayerPreAction() {
         const currentPlayer = this.gameTurnController.getCurrentPlayer()
         const currentTeam = currentPlayer.getTeamKey()
         const teamHorses = this.horses.filter(horse=> horse.getTeamKey()=== currentTeam)
-        const aliveHorses = teamHorses.filter(horse=> horse.horseState === HorseState.Idle)
-        const deadHorses = teamHorses.filter(horse => horse.horseState === HorseState.Dead)
-
-        const diceState = this.processDices()
-
-        if(diceState === DiceState.Double) {
-            this.events.emit('open-popup')
-        }
-
-        if(diceState === DiceState.Regular){
-            if(!aliveHorses.length) {
-                this.gameTurnController.switchPlayer()
-                // this.gameState = GameState.Start
-                return
-            }
-
-            //todo: waiting for horse chosing
-        }
+        const aliveHorses = teamHorses.filter(horse=> horse.horseState === HorseState.Alive)
 
 
-        // const selectedHorse = this.horses.find((horse)=> horse.isChoosing)
-        // if(selectedHorse) {
-        //     this.gameState = GameState.HorseAction
-        // }
+        //     //todo: waiting for horse chosing
     }
 
-    processDices() {
-        let diceState = DiceState.Regular
-
-        if(this.checkDouble()) diceState = DiceState.Double
-
-        if(this.checkOneSix()) diceState = DiceState.OneSix
-
-        return diceState
-    }
-
-    checkOneSix() {
-        const sixDice = this.dices.find(dice=>dice.face === 6)
-        const oneDice = this.dices.find(dice=> dice.face === 1)
-
-        return sixDice && oneDice
-    }
-
-    checkDouble() {
-        const faceArray = this.dices.map(dice=> dice.face)
-        if(uniq(faceArray).length !== faceArray.length) return true
-        return false
-    }
-
-    getDiceFaces() {
-        this.dices.map(dice=>{
-            dice.roll()
-            dice.stop()
-            dice.setFace()
-        })
-
-        this.gameState = GameState.SelectHorse
-        this.handlePlayerPreAction()
-    }
 
     update(time, delta) {
         this.count++
@@ -278,10 +180,10 @@ export default class Battle extends Phaser.Scene {
         const currentTeam = currentPlayer?.getTeamKey()
         if(this.count > 100){
             console.log(this.gameState, currentTeam, this.currentPlayer.playerState)
+            console.log('this.diceController.diceState: ', this.diceController.diceState)
+
             this.count = 0
         }
-
-        this.cameraControl.update(delta)
 
         if(this.gameState === GameState.Init) {
             this.startGame()
@@ -299,29 +201,51 @@ export default class Battle extends Phaser.Scene {
             }
 
             this.currentPlayer = this.gameTurnController.getCurrentPlayer()
-            this.gameTurnController.addActionCount(this.currentPlayer)
-            this.gameState = GameState.PlayerTurn
+            this.gameTurnController.addActionCount()
+            this.gameState = GameState.StartPlayerTurn
             this.currentPlayer.setPlayerState(PlayerState.StartTurn)
     }
 
+        if(this.gameState === GameState.StartPlayerTurn) {
+            const isStartAvailable = this.gameTurnController.processPlayerStartTurn()
+            if(isStartAvailable) {
+                this.diceController.setDiceReady()
+                this.gameTurnController.decreaseActionCount()
+                this.gameState = GameState.PlayerTurn
+                return
+            }
+
+            this.gameState = GameState.EndPlayerTurn
+        }
+
         if(this.gameState === GameState.PlayerTurn) {
-            this.currentPlayer.playTurn()
+            if(this.diceController.diceState === DiceState.Rolled) {
+                const rollResult = this.diceController.getRollResult()
+                const {diceResult, number} = rollResult
+                this.horseController.setMoveAble()
+
+                if(diceResult === DiceResult.Double) {
+                    this.gameTurnController.addActionCount()
+                    this.horseController.setSpawnAble()
+                }
+
+                if(diceResult === DiceResult.OneSix) {
+                    this.gameTurnController.addActionCount()
+                }
+
+                if(diceResult === DiceResult.Regular) {
+                }
+
+                // this.currentPlayer.playTurn(number)
+
+            }
             return
         }
 
-        if(this.gameState === GameState.SelectHorse) {
-            
-
-
+        if(this.gameState === GameState.EndPlayerTurn) {
+            this.gameState = GameState.SwitchPlayer
         }
 
-        if(this.gameState === GameState.HorseAction) {
 
-        }
-
-        if(this.gameState === GameState.Rolling) {
-            return
-            // this.time
-        }
     }
 }

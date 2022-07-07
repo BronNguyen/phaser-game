@@ -1,6 +1,6 @@
 enum HorseState  {
     Dead,
-    Idle,
+    Alive,
     Sleep,
     Choosing,
     Moving,

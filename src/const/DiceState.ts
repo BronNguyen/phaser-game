@@ -1,7 +1,8 @@
 enum DiceState {
-    Double = 'Double',
-    OneSix = 'OneSix',
-    Regular = 'Regular'
+    Ready = 'Ready',
+    Rolling = 'Rolling',
+    Rolled = 'Rolled',
+    Disabled = 'Disabled'
 }
 
 export default DiceState

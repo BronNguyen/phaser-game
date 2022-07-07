@@ -49,7 +49,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     }
 
     public spawn(): void {
-        this.horseState = HorseState.Idle
+        this.horseState = HorseState.Alive
     }
 
     public moveTo(land: ILand): void {
@@ -58,7 +58,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         this.horseState = HorseState.Moving
         this.currentPlace = land
         land.setHorse(this)
-        this.horseState = HorseState.Idle
+        this.horseState = HorseState.Alive
         this.isChoosing = false
     }
 

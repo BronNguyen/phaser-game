@@ -3,6 +3,7 @@ class DiceAnimation {
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
+        this.createRollDiceAnimation()
     }
 
     createRollDiceAnimation() {

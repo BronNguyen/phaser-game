@@ -58,10 +58,10 @@ export default class Player extends Phaser.GameObjects.Image implements IPlayerB
         horse.isChoosing = true
     }
 
-    playTurn(): void {
-        if(this.playerState === PlayerState.StartTurn) {
-            this.rollDices()
-        }
+    playTurn(distanceCount: number): void {
+        // if(this.playerState === PlayerState.StartTurn) {
+        //     this.rollDices()
+        // }
     }
 
     rollDices(): void {

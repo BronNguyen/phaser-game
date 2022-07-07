@@ -1,6 +1,6 @@
 import PlayerState from "../const/PlayerState";
 import Battle from "../scenes/Battle";
-import Player from "./Player";
+import Player from "../game-object/Player";
 
 type PlayerOrder = {
     [index: number]: Player;
@@ -23,8 +23,14 @@ export default class GameTurnController {
         }
     }
 
-    addActionCount(player: Player, quantity = 1) {
+    addActionCount(quantity = 1) {
+        const player = this.getCurrentPlayer()
         player.increaseActionCount(quantity)
+    }
+
+    decreaseActionCount() {
+        const player = this.getCurrentPlayer()
+        player.decreaseActionCount()
     }
 
     setPlayerOrder(playerOrder: Player []) {
@@ -45,12 +51,13 @@ export default class GameTurnController {
         // player.setPlayerState(PlayerState.StartTurn)
     }
 
-    processPlayerRollingDice(): boolean {
+    processPlayerStartTurn(): boolean {
         const player = this.getCurrentPlayer()
         const actionCount = player?.getActionCount()
-        const isInRollingState = player.playerState === PlayerState.Rolling
+        console.log('actionCount: ', actionCount)
+        // const isInRollingState = player.playerState === PlayerState.Rolling
 
-        if(player && isInRollingState && actionCount > 0) {
+        if(player && actionCount > 0) {
             return true
         }
 
