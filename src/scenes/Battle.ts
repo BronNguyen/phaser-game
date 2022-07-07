@@ -120,36 +120,12 @@ export default class Battle extends Phaser.Scene {
         return players
     }
 
-    handleSpawnHorse() {
-        const player = this.gameTurnController.getCurrentPlayer()
-        const teamKey = player.getTeamKey()
-        const teamTerritory = this.territoryController.getTeamTerritories(teamKey)
-        const initiator = teamTerritory.find(ter => ter.isInitiator) as Territory
-
-        const horse = initiator.getHorse()
-        if(!horse) {
-            //TODO make decide UI
-            //TODO wait Choosing Horse
-        }
-    }
-
-    handlePlayerPreAction() {
-        const currentPlayer = this.gameTurnController.getCurrentPlayer()
-        const currentTeam = currentPlayer.getTeamKey()
-        const teamHorses = this.horses.filter(horse=> horse.getTeamKey()=== currentTeam)
-        const aliveHorses = teamHorses.filter(horse=> horse.horseState === HorseState.Alive)
-
-
-        //     //todo: waiting for horse choosing
-    }
-
-
     update(time, delta) {
         this.count++
 
         const currentPlayer = this.gameTurnController.getCurrentPlayer()
         const currentTeam = currentPlayer?.getTeamKey()
-        if(this.count > 200){
+        if(this.count > 100){
             console.log(this.gameState, currentTeam, this.currentPlayer.playerState)
             console.log('this.diceController.diceState: ', this.diceController.diceState)
 
@@ -174,8 +150,7 @@ export default class Battle extends Phaser.Scene {
             this.currentPlayer = this.gameTurnController.getCurrentPlayer()
             this.gameTurnController.addActionCount()
             this.gameState = GameState.StartPlayerTurn
-            this.currentPlayer.setPlayerState(PlayerState.StartTurn)
-    }
+        }
 
         if(this.gameState === GameState.StartPlayerTurn) {
             const isStartAvailable = this.gameTurnController.processPlayerStartTurn()
@@ -184,7 +159,6 @@ export default class Battle extends Phaser.Scene {
                 this.diceController.setDiceReady()
                 this.gameTurnController.decreaseActionCount()
                 this.gameState = GameState.PlayerTurn
-                this.currentPlayer.playerState = PlayerState.Rolling
                 return
             }
 
@@ -192,69 +166,57 @@ export default class Battle extends Phaser.Scene {
         }
 
         if(this.gameState === GameState.PlayerTurn) {
+            const rollResult = this.diceController.getRollResult()
+            if(!rollResult) return
 
-            if(this.diceController.diceState === DiceState.Rolled) {
+            const { diceResult, number } = rollResult
 
-                if(currentPlayer.playerState === PlayerState.Rolling) {
-                    const rollResult = this.diceController.getRollResult()
-                    // this.horseController.setMoveAble()
+                // this.horseController.setMoveAble()
 
-                    let availableHorses = this.horseController.getTeamAliveHorses(currentTeam)
-
-                    const {diceResult} = rollResult
-
-                    if(diceResult === DiceResult.Double) {
-                        this.gameTurnController.addActionCount()
-                        // this.horseController.setSpawnAble()
-                        availableHorses = this.horseController.getTeamHorses(currentTeam)
-                        //todo set finish rank up available
-                    }
-
-                    if(diceResult === DiceResult.OneSix) {
-                        this.gameTurnController.addActionCount()
-                        availableHorses = this.horseController.getTeamHorses(currentTeam)
-                    }
-
-                    if(availableHorses.length) {
-                        this.horseAnimationManager.playAvailableHorseAnimation(availableHorses)
-                        availableHorses.map(horse=> horse.setInteractive(true))
-
-                    } else {
-                        this.gameState = GameState.StartPlayerTurn
-                    }
-
-                    this.currentPlayer.playerState = PlayerState.Moving
-                }
-
-                if(this.currentPlayer.playerState === PlayerState.Moving) {
-                    const rollResult = this.diceController.getRollResult()
-                    const {number} = rollResult
-                    const chosenHorse = this.horseController.getChosenHorse(currentTeam)
-
-                    if(chosenHorse) {
-                        this.horseAnimationManager.stopAvailableHorseAnimation()
-                        // this.horseAnimationManager.playChosenHorseAnimation(chosenHorse)
-                        if(chosenHorse.horseState === HorseState.Dead) {
-                            chosenHorse.spawn()
-                            const initiator = this.territoryController.getInitiator(currentTeam)
-                            chosenHorse.moveTo(initiator)
-                            // chosenHorse.
-                            //todo delay, horse move animation
-                        } else {
-                            const currentIndex = chosenHorse.currentPlace.getIndex()
-                            const nextTerritory = this.territoryController.getTerritory(currentTeam, number + currentIndex)
-                            chosenHorse.moveTo(nextTerritory)
-                        }
-
-                        this.currentPlayer.playerState = PlayerState.EndTurn
-                        this.gameState = GameState.StartPlayerTurn
-
-                        return
-                    }
-                }
+            let availableHorses = this.horseController.getTeamAliveHorses(currentTeam)
 
 
+            if(diceResult === DiceResult.Double) {
+                this.gameTurnController.addActionCount()
+                availableHorses = this.horseController.getTeamHorses(currentTeam)
+                //todo set finish rank up available
             }
+
+            if(diceResult === DiceResult.OneSix) {
+                this.gameTurnController.addActionCount()
+                availableHorses = this.horseController.getTeamHorses(currentTeam)
+            }
+
+            if(availableHorses.length) {
+                this.horseAnimationManager.playAvailableHorseAnimation(availableHorses)
+                availableHorses.map(horse=> horse.setInteractive(true))
+
+            } else {
+                this.gameState = GameState.StartPlayerTurn
+                return
+            }
+
+            const chosenHorse = this.horseController.getChosenHorse(currentTeam)
+
+            if(!chosenHorse) return
+
+            this.diceController.setDiceReady()
+            this.horseAnimationManager.stopAvailableHorseAnimation()
+            // this.horseAnimationManager.playChosenHorseAnimation(chosenHorse)
+            if(chosenHorse.horseState === HorseState.Dead) {
+                chosenHorse.spawn()
+                const initiator = this.territoryController.getInitiator(currentTeam)
+                chosenHorse.moveTo(initiator)
+                // chosenHorse.
+                //todo delay, horse move animation
+            } else {
+                const currentIndex = chosenHorse.currentPlace.getIndex()
+                const nextTerritory = this.territoryController.getTerritory(currentTeam, number + currentIndex)
+                chosenHorse.moveTo(nextTerritory)
+            }
+
+            this.gameState = GameState.StartPlayerTurn
+
             return
         }
 

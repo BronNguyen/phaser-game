@@ -7,7 +7,7 @@ const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
 export default class DiceController {
     scene: Phaser.Scene
-    diceState = DiceState.Disabled
+    diceState = DiceState.Ready
     dices!: Dice []
 
     constructor(scene: Phaser.Scene) {
@@ -52,16 +52,18 @@ export default class DiceController {
         return this.diceState
     }
 
-    getRollResult(): {diceResult: DiceResult, number: number} {
+    getRollResult(): {diceResult: DiceResult, number: number} | undefined {
+        if(this.diceState !== DiceState.Rolled) return
+
         let diceResult = DiceResult.Regular
 
         if(this.checkDouble()) diceResult = DiceResult.Double
 
         if(this.checkOneSix()) diceResult = DiceResult.OneSix
 
-        const number = this.dices.reduce((currentNumber, dice)=>currentNumber + dice.face, 0)
+        const number = this.dices.reduce((currentNumber, dice )=> currentNumber + dice.face, 0)
 
-        return {diceResult, number}
+        return { diceResult, number }
     }
 
     checkOneSix() {
@@ -98,7 +100,6 @@ export default class DiceController {
         })
 
         this.diceState = DiceState.Rolled
-        // this.handlePlayerPreAction()
     }
 
 }
