@@ -10,6 +10,7 @@ const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
 export default class Horse extends Phaser.GameObjects.Image implements IHorse, ITeam {
     isChoosing = false
+    isAvailable = false
     private color!: number
     private teamKey = TeamKeys.Red
     horseState = HorseState.Dead

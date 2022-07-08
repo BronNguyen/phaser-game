@@ -44,16 +44,13 @@ export default class GameTurnController {
 
     switchPlayer(): void {
         this.lastIndex = this.currentIndex
-        this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 0 , 3)
-        console.log('this.currentIndex: ', this.currentIndex)
+        this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 0 , 4)
         const player = this.getCurrentPlayer()
-        console.log('player: ', player)
     }
 
     processPlayerStartTurn(): boolean {
         const player = this.getCurrentPlayer()
         const actionCount = player?.getActionCount()
-        console.log('actionCount: ', actionCount)
 
         if(player && actionCount > 0) {
             return true

@@ -13,10 +13,12 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     isInitiator = false
     horse!: Horse
     index: number = 0
+    teamIndex: number = 0
 
-    constructor(x, y) {
+    constructor(x, y, index) {
         super(x, y, 30)
         this.territoryState = TerritoryState.Free
+        this.index = index
     }
 
     public getTeamKey(): TeamKeys {

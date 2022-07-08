@@ -3,6 +3,8 @@ enum GameState {
     SwitchPlayer = 'SwitchPlayer',
     StartPlayerTurn = 'StartPlayerTurn',
     PlayerTurn = 'PlayerTurn',
+    AfterRollDice = 'RollingDice',
+    MoveHorse = 'MoveHorse',
     EndPlayerTurn = 'EndPlayerTurn',
     Over = 'Over'
 }

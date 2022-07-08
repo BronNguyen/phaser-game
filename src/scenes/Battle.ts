@@ -156,16 +156,19 @@ export default class Battle extends Phaser.Scene {
             this.gameState = GameState.EndPlayerTurn
         }
 
+        const rollResult = this.diceController.getRollResult()
+
         if(this.gameState === GameState.PlayerTurn) {
-            const rollResult = this.diceController.getRollResult()
+            if(rollResult) {
+                this.gameState = GameState.AfterRollDice
+            }
+        }
+
+        if(this.gameState === GameState.AfterRollDice) {
             if(!rollResult) return
 
-            const { diceResult, number } = rollResult
-
-                // this.horseController.setMoveAble()
-
+            const { diceResult } = rollResult
             let availableHorses = this.horseController.getTeamAliveHorses(currentTeam)
-
 
             if(diceResult === DiceResult.Double) {
                 //todo: bug action count too much
@@ -180,31 +183,45 @@ export default class Battle extends Phaser.Scene {
             }
 
             if(availableHorses.length) {
+                this.horseController.setAvailableHorses(availableHorses)
                 this.horseAnimationManager.playAvailableHorseAnimation(availableHorses)
-                availableHorses.map(horse=> horse.setInteractive(true))
-
+                this.gameState = GameState.MoveHorse
             } else {
                 this.gameState = GameState.StartPlayerTurn
                 return
             }
+        }
 
+        if(this.gameState === GameState.MoveHorse) {
+            if(!rollResult) return
+
+            const { number } = rollResult
             const chosenHorse = this.horseController.getChosenHorse(currentTeam)
 
             if(!chosenHorse) return
 
+            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam)
+
+            if(!availableHorses.includes(chosenHorse)) {
+                this.horseController.resetChosenHorse()
+                return
+            }
+
             this.diceController.setDiceReady()
             this.horseAnimationManager.stopAvailableHorseAnimation()
-            // this.horseAnimationManager.playChosenHorseAnimation(chosenHorse)
+            this.horseController.resetAvailableHorse()
+
             if(chosenHorse.horseState === HorseState.Dead) {
                 chosenHorse.spawn()
                 const initiator = this.territoryController.getInitiator(currentTeam)
                 chosenHorse.moveTo(initiator)
-                // chosenHorse.
+                this.horseController.resetChosenHorse()
                 //todo delay, horse move animation
             } else {
                 const currentIndex = chosenHorse.currentPlace.getIndex()
-                const nextTerritory = this.territoryController.getTerritory(currentTeam, number + currentIndex)
+                const nextTerritory = this.territoryController.getTerritory(number + currentIndex)
                 chosenHorse.moveTo(nextTerritory)
+                this.horseController.resetChosenHorse()
             }
 
             this.gameState = GameState.StartPlayerTurn

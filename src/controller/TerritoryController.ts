@@ -11,11 +11,12 @@ export default class TerritoryController {
     }
 
     initTerritory(): void {
+        let index = 0
         for(var y = 0; y < 4; y++)
         {
             for(var x = 0; x < 14; x++)
             {
-                const territory  = new Territory(30 + x * 65, 30 + y * 65)
+                const territory  = new Territory(30 + x * 65, 30 + y * 65, ++index)
                 this.territories.push(territory);
             }
         }
@@ -29,9 +30,9 @@ export default class TerritoryController {
 
             if(++territoryCount > 14) return
 
-            territory.index = territoryCount
+            territory.teamIndex = territoryCount
 
-            if(territory.index === 1) territory.isInitiator = true
+            if(territory.teamIndex === 1) territory.isInitiator = true
 
             territory.joinTeam(teamKey)
             territory.coloring(graphics)
@@ -43,8 +44,9 @@ export default class TerritoryController {
         return territories
     }
 
-    getTerritory(teamKey: TeamKeys, index: number) {
-        const territory = this.getTeamTerritories(teamKey).find(ter=>ter.index === index) as Territory
+    getTerritory(index: number) {
+        const availableIndex = Phaser.Math.Wrap(index, 1, 57)
+        const territory = this.territories.find(ter=>ter.index === availableIndex) as Territory
         return territory
     }
 

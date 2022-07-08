@@ -26,13 +26,23 @@ export default class HorseController {
         })
     }
 
-    // setSpawnAble() {
-    //     this.horseControllerState = HorseControllerState.SpawnAble
-    // }
+    setAvailableHorses(horses: Horse[]): void {
+        horses.map(horse=> horse.isAvailable = true)
+    }
 
-    // setMoveAble() {
-    //     this.horseControllerState = HorseControllerState.MoveAble
-    // }
+    getTeamAvailableHorses(teamKey: TeamKeys): Horse [] {
+        const teamHorses = this.getTeamHorses(teamKey)
+        const availableHorses = teamHorses.filter(horse=> horse.isAvailable)
+        return availableHorses
+    }
+
+    resetAvailableHorse(): void {
+        this.horses.map(horse=> horse.isAvailable = false)
+    }
+
+    resetChosenHorse(): void {
+        this.horses.map(horse=> horse.isChoosing = false)
+    }
 
     getChosenHorse(teamKey: TeamKeys): Horse | undefined {
         const teamHorses = this.getTeamHorses(teamKey)
