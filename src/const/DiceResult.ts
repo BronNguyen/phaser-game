@@ -1,7 +1,12 @@
-enum DiceResult {
+export enum DiceResult {
     Double = 'Double',
     OneSix = 'OneSix',
     Regular = 'Regular'
 }
 
-export default DiceResult
+type RollResult = {
+    diceResult: DiceResult,
+    number: number
+}
+
+export default RollResult

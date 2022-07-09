@@ -81,7 +81,6 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     }
 
     public moveTo(land: ILand): void {
-        console.log('land: ', land)
         if(!this.isChoosing) return
 
         this.horseState = HorseState.Moving

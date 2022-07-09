@@ -3,6 +3,7 @@ import Start from "../game-object/Start"
 import TeamKeys from "../const/TeamKeys"
 import Horse from "../game-object/Horse"
 import HorseState from "../const/HorseState"
+import RollResult, { DiceResult } from "../const/DiceResult"
 
 export default class HorseController {
     scene: Phaser.Scene
@@ -30,15 +31,36 @@ export default class HorseController {
         horses.map(horse=> horse.isAvailable = true)
     }
 
-    getTeamAvailableHorses(teamKey: TeamKeys, number: number): Horse [] {
-        // todo fix this for birth horse
+    getTeamAvailableHorses(teamKey: TeamKeys): Horse [] {
         const teamHorses = this.getTeamHorses(teamKey)
-        const availableHorses = teamHorses.filter(horse => horse.isAvailable)
-        const movableHorses = availableHorses.filter(horse=> {
-            const movable = horse.getAvailableDestination(number)
-            return horse.horseState === HorseState.Alive? movable: undefined
-        })
-        return movableHorses
+        const availableHorses = teamHorses.filter(horse=> horse.isAvailable)
+        return availableHorses
+    }
+
+    setAvailableHorseFromRollResult(teamKey: TeamKeys, rollResult: RollResult, inititatorHorse: Horse | undefined): Horse[] {
+        const {diceResult, number} = rollResult
+        let availableHorses: Horse[] = []
+        if(diceResult === DiceResult.Double) {
+            const horses = this.getTeamHorses(teamKey)
+            const isTeamHorseAtStart = inititatorHorse?.getTeamKey() === teamKey
+            //can not kick our team horse
+            if(isTeamHorseAtStart) {
+                const aliveHorses = this.getTeamAliveHorses(teamKey)
+                availableHorses = aliveHorses.filter(horse => {
+                    return horse.getAvailableDestination(number)
+                })
+            }
+
+            //todo do this now
+
+
+            // availableHorses =
+        }
+
+        if (diceResult === DiceResult.OneSix) {
+
+        }
+        return []
     }
 
     resetAvailableHorse(): void {

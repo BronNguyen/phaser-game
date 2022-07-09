@@ -4,7 +4,7 @@ import SceneKeys from "../const/SceneKeys"
 import TeamKeys from "../const/TeamKeys";
 import GameState from "../const/GameState";
 import HorseState from "../const/HorseState";
-import DiceResult from "../const/DiceResult";
+import RollResult, { DiceResult } from "../const/DiceResult";
 import PlayerColors from "../const/PlayerColors";
 
 import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory";
@@ -158,7 +158,7 @@ export default class Battle extends Phaser.Scene {
             this.gameState = GameState.EndPlayerTurn
         }
 
-        const rollResult = this.diceController.getRollResult()
+        const rollResult = this.diceController.getRollResult() as RollResult
 
         if(this.gameState === GameState.PlayerTurn) {
             if(rollResult) {
@@ -169,7 +169,9 @@ export default class Battle extends Phaser.Scene {
         if(this.gameState === GameState.AfterRollDice) {
             if(!rollResult) return
 
-            const { diceResult } = rollResult
+            const { diceResult, number } = rollResult
+            const initiatorHorse = this.territoryController.getInitiator(currentTeam)
+            //todo use diceresult to find available horse, with available move
             let availableHorses = this.horseController.getTeamAliveHorses(currentTeam)
 
             if(diceResult === DiceResult.Double) {
@@ -202,7 +204,7 @@ export default class Battle extends Phaser.Scene {
 
             if(!chosenHorse) return
 
-            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam, number)
+            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam)
 
             if(!availableHorses.includes(chosenHorse)) {
                 this.horseController.resetChosenHorse()
@@ -222,7 +224,6 @@ export default class Battle extends Phaser.Scene {
             } else {
                 const currentIndex = chosenHorse.currentPlace.getIndex()
                 const availableDestination = chosenHorse.getAvailableDestination(number)
-                console.log('availableDestination: ', availableDestination)
                 // if(!availableDestination) {
                 //     //todo cant move horse
                 // }

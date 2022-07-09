@@ -1,7 +1,7 @@
 import Dice from '../game-object/Dice'
 import { uniq } from 'lodash'
-import DiceResult from "../const/DiceResult"
 import DiceState from '../const/DiceState'
+import RollResult, { DiceResult } from '../const/DiceResult'
 
 const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
@@ -52,8 +52,9 @@ export default class DiceController {
         return this.diceState
     }
 
-    getRollResult(): {diceResult: DiceResult, number: number} | undefined {
+    getRollResult(): RollResult | undefined {
         if(this.diceState !== DiceState.Rolled) return
+
 
         let diceResult = DiceResult.Regular
 

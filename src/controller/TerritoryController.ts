@@ -70,6 +70,31 @@ export default class TerritoryController {
         return territory
     }
 
+    public getTerritoriesWithinDistance(landFrom: ILand, landTo: ILand): ILand [] {
+        const territories: ILand[] = []
+
+        if(!(landTo instanceof Finish)) {
+            for(let i = landFrom.getIndex(); i < landTo.getIndex(); i++ ) {
+                territories.push(this.territories[i+1])
+            }
+        }
+
+        // if(!(landFrom instanceof Finish) && landTo instanceof Finish) {
+        //     const offset = 55 - this.distance
+
+        //     for(let i = 0; i < offset; i++){
+        //         territories.push(this.territories[landFrom.getIndex() + i + 1])
+        //     }
+
+        //     for(let i = 0; i < landTo.finishIndex; i++) {
+        //         territories.push(this.territories[])
+        //     }
+        // }
+
+        return territories
+    }
+
+
     getInitiator(teamKey): Territory {
         const initiator = this.getTeamTerritories(teamKey).find(ter=>ter.isInitiator) as Territory
         return initiator
