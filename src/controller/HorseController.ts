@@ -30,10 +30,15 @@ export default class HorseController {
         horses.map(horse=> horse.isAvailable = true)
     }
 
-    getTeamAvailableHorses(teamKey: TeamKeys): Horse [] {
+    getTeamAvailableHorses(teamKey: TeamKeys, number: number): Horse [] {
+        // todo fix this for birth horse
         const teamHorses = this.getTeamHorses(teamKey)
-        const availableHorses = teamHorses.filter(horse=> horse.isAvailable)
-        return availableHorses
+        const availableHorses = teamHorses.filter(horse => horse.isAvailable)
+        const movableHorses = availableHorses.filter(horse=> {
+            const movable = horse.getAvailableDestination(number)
+            return horse.horseState === HorseState.Alive? movable: undefined
+        })
+        return movableHorses
     }
 
     resetAvailableHorse(): void {

@@ -8,14 +8,13 @@ import IShape from "../interface/IShape"
 
 export default class Territory extends Phaser.Geom.Circle implements ITeam, ILand, IShape {
     territoryState!: TerritoryState
-    private color!: number
+    protected color!: number
     private teamKey = TeamKeys.Red
     isInitiator = false
     horse!: Horse
     index: number = 0
-    teamIndex: number = 0
 
-    constructor(x, y, index) {
+    constructor(x: number, y: number, index: number) {
         super(x, y, 30)
         this.territoryState = TerritoryState.Free
         this.index = index
@@ -55,8 +54,9 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
         return this.index
     }
 
-    public coloring(graphics: Phaser.GameObjects.Graphics): void {
+    public coloring(graphics: Phaser.GameObjects.Graphics, scene: Phaser.Scene): void {
         graphics.fillStyle(this.color, 0.3)
         graphics.fillCircleShape(this)
+        scene.add.text(this.x, this. y, `${this.index}`, {color: 'black', fontSize: '30'})
     }
 }

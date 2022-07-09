@@ -1,5 +1,7 @@
+import ILand from "../interface/ILand"
 import TeamKeys from "../const/TeamKeys"
 import Territory from "../game-object/Territory"
+import Finish from "../game-object/Finish"
 
 export default class TerritoryController {
     scene: Phaser.Scene
@@ -11,16 +13,26 @@ export default class TerritoryController {
     }
 
     initTerritory(): void {
+        let finishIndex = 0
         let index = 0
         for(var y = 0; y < 4; y++)
         {
-            for(var x = 0; x < 14; x++)
+            for(var x = 0; x < 20; x++)
             {
-                const territory  = new Territory(30 + x * 65, 30 + y * 65, ++index)
-                this.territories.push(territory);
+                let territory: Territory
+                if(x < 14) {
+                    index++
+                    territory  = new Territory(30 + x * 65, 30 + y * 65, index)
+                }else {
+                    territory  = new Finish(30 + x * 65, 30 + y * 65, index + 39, ++finishIndex)
+                }
+
+                this.territories.push(territory)
+                if(finishIndex > 5) finishIndex = 0
             }
         }
     }
+
 
     setTeamTerritories(teamKey: TeamKeys, graphics: Phaser.GameObjects.Graphics) {
         let territoryCount = 0
@@ -28,14 +40,12 @@ export default class TerritoryController {
         this.territories.map((territory)=> {
             if(territory.getColor()) return
 
-            if(++territoryCount > 14) return
+            if(++territoryCount > 20) return
 
-            territory.teamIndex = territoryCount
-
-            if(territory.teamIndex === 1) territory.isInitiator = true
+            if(territoryCount === 2) territory.isInitiator = true
 
             territory.joinTeam(teamKey)
-            territory.coloring(graphics)
+            territory.coloring(graphics, this.scene)
         })
     }
 
@@ -44,9 +54,19 @@ export default class TerritoryController {
         return territories
     }
 
-    getTerritory(index: number) {
-        const availableIndex = Phaser.Math.Wrap(index, 1, 57)
-        const territory = this.territories.find(ter=>ter.index === availableIndex) as Territory
+    getTerritory(index: number, isFinish: boolean): ILand {
+        if(!isFinish) {
+            const availableIndex = Phaser.Math.Wrap(index, 1, 57)
+            const territory = this.territories.find(ter=>ter.index === availableIndex) as Territory
+            return territory
+        }
+
+        const territory = this.territories.find(ter => {
+            if(ter instanceof Finish) {
+                return ter.finishIndex === index
+            }
+        }) as ILand
+
         return territory
     }
 

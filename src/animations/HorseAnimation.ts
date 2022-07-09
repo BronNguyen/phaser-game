@@ -12,8 +12,8 @@ const AVAILABLE_HORSE_CONFIG = {
 
 class HorseAnimation {
     scene: Phaser.Scene
-    availableHorseTween!: Phaser.Tweens.Tween
-    chosenHorseTween!: Phaser.Tweens.Tween
+    availableHorseTween!: Phaser.Tweens.Tween | undefined
+    chosenHorseTween!: Phaser.Tweens.Tween | undefined
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -27,14 +27,26 @@ class HorseAnimation {
     }
 
     stopAvailableHorseAnimation(): void {
+        if(!this.availableHorseTween) return
+
         this.availableHorseTween.stop()
         this.scene.tweens.remove(this.availableHorseTween)
+        this.availableHorseTween = undefined
     }
 
     playChosenHorseAnimation(horse: Horse): void {
         if(this.chosenHorseTween) return
 
         this.chosenHorseTween = this.scene.tweens.add({...AVAILABLE_HORSE_CONFIG, targets: horse})
+        this.chosenHorseTween.play()
+    }
+
+    stopChosenHorseAnimation(): void {
+        if(!this.chosenHorseTween) return
+
+        this.chosenHorseTween.stop()
+        this.scene.tweens.remove(this.chosenHorseTween)
+        this.availableHorseTween = undefined
     }
 
 }

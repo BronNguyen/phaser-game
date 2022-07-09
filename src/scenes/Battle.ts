@@ -94,6 +94,8 @@ export default class Battle extends Phaser.Scene {
         teamKeys.forEach((teamKey, index) => {
             this.initTeam(TeamKeys[teamKey], index)
         });
+
+
     }
 
     initTeam(teamKey: TeamKeys, teamIndex) {
@@ -124,7 +126,7 @@ export default class Battle extends Phaser.Scene {
         const currentPlayer = this.gameTurnController.getCurrentPlayer()
         const currentTeam = currentPlayer?.getTeamKey()
         if(this.count > 100){
-            console.log(this.gameState, currentTeam)
+            // console.log(this.gameState, currentTeam)
 
             this.count = 0
         }
@@ -200,7 +202,7 @@ export default class Battle extends Phaser.Scene {
 
             if(!chosenHorse) return
 
-            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam)
+            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam, number)
 
             if(!availableHorses.includes(chosenHorse)) {
                 this.horseController.resetChosenHorse()
@@ -219,7 +221,15 @@ export default class Battle extends Phaser.Scene {
                 //todo delay, horse move animation
             } else {
                 const currentIndex = chosenHorse.currentPlace.getIndex()
-                const nextTerritory = this.territoryController.getTerritory(number + currentIndex)
+                const availableDestination = chosenHorse.getAvailableDestination(number)
+                console.log('availableDestination: ', availableDestination)
+                // if(!availableDestination) {
+                //     //todo cant move horse
+                // }
+                const {index, isFinish} = availableDestination as {index: number, isFinish: boolean}
+
+                const nextTerritory = this.territoryController.getTerritory(index, isFinish)
+                chosenHorse.setRaceDistance(number)
                 chosenHorse.moveTo(nextTerritory)
                 this.horseController.resetChosenHorse()
             }
