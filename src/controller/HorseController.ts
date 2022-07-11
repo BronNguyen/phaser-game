@@ -47,7 +47,9 @@ export default class HorseController {
             if(isTeamHorseAtStart) {
                 const aliveHorses = this.getTeamAliveHorses(teamKey)
                 availableHorses = aliveHorses.filter(horse => {
-                    return horse.getAvailableDestination(number)
+                    //temp comment
+                    // return horse.getAvailableDestination(number)
+                    return true
                 })
             }
 

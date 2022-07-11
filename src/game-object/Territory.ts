@@ -11,6 +11,7 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     protected color!: number
     private teamKey = TeamKeys.Red
     isInitiator = false
+    isFinishGate = false
     horse!: Horse
     index: number = 0
 

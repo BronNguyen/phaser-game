@@ -40,7 +40,11 @@ export default class TerritoryController {
         this.territories.map((territory)=> {
             if(territory.getColor()) return
 
-            if(++territoryCount > 20) return
+            territoryCount++
+
+            if(territoryCount > 20) return
+
+            if(territoryCount === 1) territory.isFinishGate = true
 
             if(territoryCount === 2) territory.isInitiator = true
 
@@ -49,25 +53,51 @@ export default class TerritoryController {
         })
     }
 
+    fetchTerritories(teamKey: TeamKeys, currentTerritory: Territory, moveNumber: number): Territory [] {
+        const territories: Territory[] = []
+
+        let current = currentTerritory
+
+        for (let i = 0; i < moveNumber; i++) {
+
+            if (current instanceof Finish ) {
+                const index = current.getIndex()
+                current = this.getFinishTerritory(index + 1, teamKey)
+            }
+
+            let isTeamFinishGate = current.isFinishGate && current.getTeamKey() === teamKey
+            if (isTeamFinishGate) {
+                current = this.getFinishTerritory(1, teamKey)
+            } else {
+                const index = current.getIndex()
+                current = this.getTerritory(index + 1)
+                territories.push(current)
+            }
+        }
+
+        return territories
+    }
+
     getTeamTerritories(teamKey: TeamKeys): Territory [] {
         const territories = this.territories.filter(territory=> territory.getTeamKey() === teamKey)
         return territories
     }
 
-    getTerritory(index: number, isFinish: boolean): ILand {
-        if(!isFinish) {
-            const availableIndex = Phaser.Math.Wrap(index, 1, 57)
-            const territory = this.territories.find(ter=>ter.index === availableIndex) as Territory
-            return territory
-        }
-
-        const territory = this.territories.find(ter => {
-            if(ter instanceof Finish) {
-                return ter.finishIndex === index
-            }
-        }) as ILand
-
+    getTerritory(index: number): Territory {
+        const availableIndex = Phaser.Math.Wrap(index, 1, 57)
+        const territory = this.territories.find(ter=> ter.index === availableIndex) as Territory
         return territory
+    }
+
+    getFinishTerritory(finishIndex: number, teamKey: TeamKeys): Finish {
+
+        const territory = this.territories.find((ter)=> {
+            if(ter instanceof Finish) {
+                return ter.finishIndex === finishIndex && ter.getTeamKey() === teamKey
+            }
+        })
+
+        return territory as Finish
     }
 
     public getTerritoriesWithinDistance(landFrom: ILand, landTo: ILand): ILand [] {

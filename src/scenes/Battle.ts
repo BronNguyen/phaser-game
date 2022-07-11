@@ -223,15 +223,16 @@ export default class Battle extends Phaser.Scene {
                 //todo delay, horse move animation
             } else {
                 const currentIndex = chosenHorse.currentPlace.getIndex()
-                const availableDestination = chosenHorse.getAvailableDestination(number)
+                //temp comment
+                // const availableDestination = chosenHorse.getAvailableDestination(number)
                 // if(!availableDestination) {
                 //     //todo cant move horse
                 // }
-                const {index, isFinish} = availableDestination as {index: number, isFinish: boolean}
+                // const {index, isFinish} = availableDestination as {index: number, isFinish: boolean}
 
-                const nextTerritory = this.territoryController.getTerritory(index, isFinish)
+                // const nextTerritory = this.territoryController.getTerritory(index, isFinish)
                 chosenHorse.setRaceDistance(number)
-                chosenHorse.moveTo(nextTerritory)
+                // chosenHorse.moveTo(nextTerritory)
                 this.horseController.resetChosenHorse()
             }
 
