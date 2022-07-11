@@ -170,20 +170,39 @@ export default class Battle extends Phaser.Scene {
             if(!rollResult) return
 
             const { diceResult, number } = rollResult
-            const initiatorHorse = this.territoryController.getInitiator(currentTeam)
             //todo use diceresult to find available horse, with available move
-            let availableHorses = this.horseController.getTeamAliveHorses(currentTeam)
+            let teamHorses = this.horseController.getTeamHorses(currentTeam)
+            const teamInitiator = this.territoryController.getInitiator(currentTeam)
+            const guardHorse = teamInitiator.getHorse()
+            const isGuardHorseTeamHorse = guardHorse && guardHorse.getTeamKey() === currentTeam
+
+            teamHorses.forEach((horse: Horse) => {
+                if(horse.horseState === HorseState.Dead) {
+                    if(isGuardHorseTeamHorse) {
+                        return
+                    }
+
+                    if(guardHorse) {
+                        horse.isAvailable = true
+                    }
+                }
+                if(horse.horseState === HorseState.Alive) {
+                    
+                }
+            })
+
+            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam)
 
             if(diceResult === DiceResult.Double) {
                 //todo: bug action count too much
                 this.gameTurnController.addActionCount()
-                availableHorses = this.horseController.getTeamHorses(currentTeam)
+                // availableHorses = this.horseController.getTeamHorses(currentTeam)
                 //todo set finish rank up available
             }
 
             if(diceResult === DiceResult.OneSix) {
                 this.gameTurnController.addActionCount()
-                availableHorses = this.horseController.getTeamHorses(currentTeam)
+                // availableHorses = this.horseController.getTeamHorses(currentTeam)
             }
 
             if(availableHorses.length) {
@@ -204,9 +223,10 @@ export default class Battle extends Phaser.Scene {
 
             if(!chosenHorse) return
 
-            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam)
+            const teamHorses = this.horseController.getTeamHorses(currentTeam)
 
-            if(!availableHorses.includes(chosenHorse)) {
+
+            if(!teamHorses.includes(chosenHorse)) {
                 this.horseController.resetChosenHorse()
                 return
             }
