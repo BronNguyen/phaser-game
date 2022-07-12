@@ -110,6 +110,7 @@ export default class Battle extends Phaser.Scene {
 
         this.horseController.initTeamHorse(teamKey, teamStart)
         this.territoryController.setTeamTerritories(teamKey, this.graphics)
+        this.territoryController.setTeamFinish(teamKey, this.graphics)
     }
 
     startGame() {

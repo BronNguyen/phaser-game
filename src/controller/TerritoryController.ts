@@ -13,22 +13,21 @@ export default class TerritoryController {
     }
 
     initTerritory(): void {
-        let finishIndex = 0
         let index = 0
-        for(var y = 0; y < 4; y++)
-        {
-            for(var x = 0; x < 20; x++)
-            {
-                let territory: Territory
-                if(x < 14) {
-                    index++
-                    territory  = new Territory(30 + x * 65, 30 + y * 65, index)
-                }else {
-                    territory  = new Finish(30 + x * 65, 30 + y * 65, index + 39, ++finishIndex)
-                }
-
+        for(let y = 0; y < 4; y++){
+            for(let x = 0; x < 14; x++){
+                index++
+                const territory  = new Territory(30 + x * 65, 30 + y * 65, index)
                 this.territories.push(territory)
-                if(finishIndex > 5) finishIndex = 0
+            }
+        }
+
+        let finishIndex = 0
+        for(let y = 0; y < 4; y++) {
+            for(let x = 0; x < 6; x++) {
+                index++
+                const finish = new Finish(30 + (x+ 14) * 65, 30 + y * 65, index, finishIndex)
+                this.territories.push(finish)
             }
         }
     }
@@ -37,12 +36,12 @@ export default class TerritoryController {
     setTeamTerritories(teamKey: TeamKeys, graphics: Phaser.GameObjects.Graphics) {
         let territoryCount = 0
 
-        this.territories.map((territory)=> {
+        this.territories.forEach((territory)=> {
             if(territory.getColor()) return
 
             territoryCount++
 
-            if(territoryCount > 20) return
+            if(territoryCount > 14) return
 
             if(territoryCount === 1) territory.isFinishGate = true
 
@@ -51,6 +50,20 @@ export default class TerritoryController {
             territory.joinTeam(teamKey)
             territory.coloring(graphics, this.scene)
         })
+    }
+
+    setTeamFinish(teamKey: TeamKeys, graphics: Phaser.GameObjects.Graphics) {
+        let finishCount = 0
+
+        for(let i = this.territories.length - 1; i > 0; i--){
+            if(this.territories[i].getColor()) continue
+            finishCount++
+
+            if(finishCount > 6) return
+
+            this.territories[i].joinTeam(teamKey)
+            this.territories[i].coloring(graphics, this.scene)
+        }
     }
 
     fetchTerritories(teamKey: TeamKeys, currentTerritory: Territory, moveNumber: number): Territory [] {
