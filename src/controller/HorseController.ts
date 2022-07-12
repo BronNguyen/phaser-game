@@ -19,12 +19,13 @@ export default class HorseController {
         const horseGroup = this.scene.add.group({classType: Horse})
         const teamHorses = Array(4).fill(undefined)
 
-        teamHorses.map((_, index)=> {
+        teamHorses.map(()=> {
             const horse = horseGroup.get()
             horse.joinTeam(teamKey)
-            horse.setPosition(40 * (index % 2) + 30 + teamStart.left,40 * (index % 2) + 30 + teamStart.top)
             this.horses.push(horse)
+            teamStart.adopt(horse)
         })
+
     }
 
     setAvailableHorses(horses: Horse[]): void {
@@ -35,34 +36,6 @@ export default class HorseController {
         const teamHorses = this.getTeamHorses(teamKey)
         const availableHorses = teamHorses.filter(horse=> horse.isAvailable)
         return availableHorses
-    }
-
-    setAvailableHorseFromRollResult(teamKey: TeamKeys, rollResult: RollResult, inititatorHorse: Horse | undefined): Horse[] {
-        const {diceResult, number} = rollResult
-        let availableHorses: Horse[] = []
-        if(diceResult === DiceResult.Double) {
-            const horses = this.getTeamHorses(teamKey)
-            const isTeamHorseAtStart = inititatorHorse?.getTeamKey() === teamKey
-            //can not kick our team horse
-            if(isTeamHorseAtStart) {
-                const aliveHorses = this.getTeamAliveHorses(teamKey)
-                availableHorses = aliveHorses.filter(horse => {
-                    //temp comment
-                    // return horse.getAvailableDestination(number)
-                    return true
-                })
-            }
-
-            //todo do this now
-
-
-            // availableHorses =
-        }
-
-        if (diceResult === DiceResult.OneSix) {
-
-        }
-        return []
     }
 
     resetAvailableHorse(): void {

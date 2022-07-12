@@ -2,31 +2,58 @@ import ITeam from "../interface/ITeam"
 import TeamKeys from "../const/TeamKeys"
 import IShape from "../interface/IShape"
 import PlayerColors from "../const/PlayerColors"
-import ILand from "../interface/ILand"
 import Horse from "./Horse"
+import StartPosition from "../const/StartPosition"
 
-export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShape {
-    private index = 0
+export default class Start extends  Phaser.Geom.Rectangle implements ITeam, IShape {
     private color!: number
     private teamKey = TeamKeys.Red
     private horses: Horse [] = []
+    private positions: StartPosition []
 
     constructor(x, y) {
         super(x, y, 100, 100)
+        this.positions =
+        [{
+            index: 1,
+            x: 30,
+            y: 30,
+            horse: null,
+        },
+        {
+            index: 2,
+            x: 70,
+            y: 30,
+            horse: null,
+        },
+        {
+            index: 3,
+            x: 30,
+            y: 70,
+            horse: null,
+        },
+        {
+            index: 4,
+            x: 70,
+            y: 70,
+            horse: null,
+        }]
+    }
+
+    adopt(horse: Horse) {
+        for(let i = 0; i < this.positions.length; i++) {
+            if(!this.positions[i].horse) {
+                this.positions[i].horse = horse
+                const {x, y} = this.positions[i]
+                horse.setPosition(this.left + x, this.top + y)
+                return
+            }
+        }
     }
 
     joinTeam(teamKey: TeamKeys): void {
         this.teamKey = teamKey
         this.color = PlayerColors[teamKey]
-    }
-
-    getIndex(): number {
-        return this.index
-    }
-
-    getHorse(): Horse | null {
-        const horse = Phaser.Math.RND.pick(this.horses)
-        return horse
     }
 
     setHorse(horse: Horse): void {
