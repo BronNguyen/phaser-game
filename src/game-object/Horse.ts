@@ -16,7 +16,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     private distance = 0
     horseState = HorseState.Dead
     currentPlace!: ILand
-    // index: number = 0
+    potentialDestination!: ILand| undefined
 
     constructor(scene: Phaser.Scene) {
         super(scene, 0, 0, 'horse')
@@ -62,6 +62,14 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         return this.distance
     }
 
+    public getPotentialDestination(): ILand| undefined {
+        return this.potentialDestination
+    }
+
+    public setPotentialDestination(land: ILand| undefined): void {
+        this.potentialDestination = land
+    }
+
     public getAvailableDestination(number: number): {index: number ,isFinish : boolean} | undefined {
         if(!(this.currentPlace instanceof Finish)) {
             const distance = number + this.distance
@@ -83,6 +91,8 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     public moveTo(land: ILand): void {
         if(!this.isChoosing) return
 
+        const lastPlace = this.currentPlace
+        lastPlace?.setHorse(undefined)
         this.horseState = HorseState.Moving
         this.currentPlace = land
         land.setHorse(this)

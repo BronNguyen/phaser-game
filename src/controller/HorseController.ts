@@ -66,7 +66,10 @@ export default class HorseController {
     }
 
     resetAvailableHorse(): void {
-        this.horses.map(horse=> horse.isAvailable = false)
+        this.horses.map(horse=> {
+            horse.isAvailable = false
+            horse.setPotentialDestination(undefined)
+        })
     }
 
     resetChosenHorse(): void {

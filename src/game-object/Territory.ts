@@ -12,7 +12,7 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     private teamKey = TeamKeys.Red
     isInitiator = false
     isFinishGate = false
-    horse!: Horse
+    horse!: Horse| undefined
     index: number = 0
 
     constructor(x: number, y: number, index: number) {
@@ -34,8 +34,10 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
         this.color = PlayerColors[teamKey]
     }
 
-    public setHorse(horse: Horse): void {
+    public setHorse(horse: Horse | undefined): void {
         this.horse = horse
+        if(!this.horse) return
+
         this.horse.setPosition(this.x, this.y)
     }
 

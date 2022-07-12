@@ -16,7 +16,7 @@ import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
 import Dice from "../game-object/Dice";
 
-import { shuffle } from 'lodash'
+import { shuffle, clone } from 'lodash'
 
 import GameTurnController from "../controller/GameTurnController";
 import DiceController from "../controller/DiceController";
@@ -170,44 +170,75 @@ export default class Battle extends Phaser.Scene {
             if(!rollResult) return
 
             const { diceResult, number } = rollResult
-            //todo use diceresult to find available horse, with available move
-            let teamHorses = this.horseController.getTeamHorses(currentTeam)
+
+            console.log('currentTeam: ', currentTeam)
+            const teamHorses = this.horseController.getTeamHorses(currentTeam)
+            console.log('teamHorses: ', teamHorses)
             const teamInitiator = this.territoryController.getInitiator(currentTeam)
             const guardHorse = teamInitiator.getHorse()
+            console.log('guardHorse: ', guardHorse)
             const isGuardHorseTeamHorse = guardHorse && guardHorse.getTeamKey() === currentTeam
+            console.log('isGuardHorseTeamHorse: ', isGuardHorseTeamHorse)
 
+            //process with number
             teamHorses.forEach((horse: Horse) => {
                 if(horse.horseState === HorseState.Dead) {
                     if(isGuardHorseTeamHorse) {
                         return
                     }
 
-                    if(guardHorse) {
-                        horse.isAvailable = true
-                    }
+                    horse.isAvailable = true
+                    return
                 }
+
                 if(horse.horseState === HorseState.Alive) {
-                    
+                    const currentTerritory = horse.currentPlace
+                    console.log('currentTerritory: ', currentTerritory)
+                    if(!(currentTerritory instanceof Territory)) return
+
+                    const territories = this.territoryController.fetchTerritories(currentTeam, currentTerritory, number)
+                    console.log('territories: ', territories)
+                    if(!territories.length) return
+
+                    const lastTerritory = territories.pop() as Territory
+                    console.log('lastTerritory: ', lastTerritory)
+
+                    const hasHorseConfront = territories.find((ter)=> !!ter.getHorse())
+                    console.log('hasHorseConfront: ', hasHorseConfront)
+                    if(hasHorseConfront) return
+
+                    const destinationHorse = lastTerritory.getHorse()
+                    console.log('destinationHorse: ', destinationHorse)
+
+                    if(destinationHorse && destinationHorse.getTeamKey() === currentTeam) return
+
+                    horse.setPotentialDestination(lastTerritory)
+                    horse.isAvailable = true
                 }
             })
 
-            const availableHorses = this.horseController.getTeamAvailableHorses(currentTeam)
-
+            const processedHorses = this.horseController.getTeamAvailableHorses(currentTeam)
+            console.log('processedHorses: ', processedHorses)
+            let availableHorses = clone(processedHorses)
+            console.log('availableHorses: ', availableHorses)
+            //process with dice result
             if(diceResult === DiceResult.Double) {
-                //todo: bug action count too much
                 this.gameTurnController.addActionCount()
-                // availableHorses = this.horseController.getTeamHorses(currentTeam)
                 //todo set finish rank up available
             }
 
             if(diceResult === DiceResult.OneSix) {
                 this.gameTurnController.addActionCount()
-                // availableHorses = this.horseController.getTeamHorses(currentTeam)
             }
 
+            if(diceResult === DiceResult.Regular) {
+                availableHorses = processedHorses.filter((horse)=> horse.horseState === HorseState.Alive)
+            }
+            console.log('availableHorses: ', availableHorses)
+
             if(availableHorses.length) {
-                this.horseController.setAvailableHorses(availableHorses)
                 this.horseAnimationManager.playAvailableHorseAnimation(availableHorses)
+                this.horseController.resetChosenHorse()
                 this.gameState = GameState.MoveHorse
             } else {
                 this.gameState = GameState.StartPlayerTurn
@@ -223,39 +254,23 @@ export default class Battle extends Phaser.Scene {
 
             if(!chosenHorse) return
 
-            const teamHorses = this.horseController.getTeamHorses(currentTeam)
-
-
-            if(!teamHorses.includes(chosenHorse)) {
-                this.horseController.resetChosenHorse()
-                return
-            }
-
             this.diceController.setDiceReady()
             this.horseAnimationManager.stopAvailableHorseAnimation()
-            this.horseController.resetAvailableHorse()
 
             if(chosenHorse.horseState === HorseState.Dead) {
                 chosenHorse.spawn()
                 const initiator = this.territoryController.getInitiator(currentTeam)
                 chosenHorse.moveTo(initiator)
-                this.horseController.resetChosenHorse()
                 //todo delay, horse move animation
             } else {
-                const currentIndex = chosenHorse.currentPlace.getIndex()
-                //temp comment
-                // const availableDestination = chosenHorse.getAvailableDestination(number)
-                // if(!availableDestination) {
-                //     //todo cant move horse
-                // }
-                // const {index, isFinish} = availableDestination as {index: number, isFinish: boolean}
-
-                // const nextTerritory = this.territoryController.getTerritory(index, isFinish)
                 chosenHorse.setRaceDistance(number)
-                // chosenHorse.moveTo(nextTerritory)
-                this.horseController.resetChosenHorse()
+                const territory = chosenHorse.getPotentialDestination()
+                if(!territory) return
+                chosenHorse.moveTo(territory)
             }
 
+            this.horseController.resetAvailableHorse()
+            this.horseController.resetChosenHorse()
             this.gameState = GameState.StartPlayerTurn
 
             return

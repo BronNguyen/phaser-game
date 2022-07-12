@@ -5,7 +5,7 @@ import PlayerColors from "../const/PlayerColors"
 import ILand from "../interface/ILand"
 import Horse from "./Horse"
 
-export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShape, ILand {
+export default class Start extends Phaser.Geom.Rectangle implements ITeam, IShape {
     private index = 0
     private color!: number
     private teamKey = TeamKeys.Red

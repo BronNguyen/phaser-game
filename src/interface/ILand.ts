@@ -1,9 +1,9 @@
 import Horse from "../game-object/Horse"
 
 interface ILand {
-    horse?: Horse
+    horse: Horse|undefined
 
-    setHorse(horse: Horse): void
+    setHorse(horse: Horse| undefined): void
     getHorse(): Horse | null
     getIndex(): number
     getPosition(): {x: number, y: number}

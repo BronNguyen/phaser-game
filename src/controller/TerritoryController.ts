@@ -56,21 +56,31 @@ export default class TerritoryController {
     fetchTerritories(teamKey: TeamKeys, currentTerritory: Territory, moveNumber: number): Territory [] {
         const territories: Territory[] = []
 
-        let current = currentTerritory
+        let current: Territory| undefined = currentTerritory
+        console.log('current: ', current)
 
         for (let i = 0; i < moveNumber; i++) {
 
             if (current instanceof Finish ) {
                 const index = current.getIndex()
                 current = this.getFinishTerritory(index + 1, teamKey)
+                if(!current) return []
             }
 
+            if(!current) return []
+
             let isTeamFinishGate = current.isFinishGate && current.getTeamKey() === teamKey
+            console.log('isTeamFinishGate: ', isTeamFinishGate)
+
             if (isTeamFinishGate) {
                 current = this.getFinishTerritory(1, teamKey)
+                if(!current) return []
+
             } else {
                 const index = current.getIndex()
                 current = this.getTerritory(index + 1)
+                if(!current) return []
+
                 territories.push(current)
             }
         }
@@ -85,11 +95,13 @@ export default class TerritoryController {
 
     getTerritory(index: number): Territory {
         const availableIndex = Phaser.Math.Wrap(index, 1, 57)
+        console.log('availableIndex: ', availableIndex)
         const territory = this.territories.find(ter=> ter.index === availableIndex) as Territory
+        console.log('territory: ', territory)
         return territory
     }
 
-    getFinishTerritory(finishIndex: number, teamKey: TeamKeys): Finish {
+    getFinishTerritory(finishIndex: number, teamKey: TeamKeys): Territory | undefined {
 
         const territory = this.territories.find((ter)=> {
             if(ter instanceof Finish) {
@@ -97,7 +109,7 @@ export default class TerritoryController {
             }
         })
 
-        return territory as Finish
+        return territory
     }
 
     public getTerritoriesWithinDistance(landFrom: ILand, landTo: ILand): ILand [] {
