@@ -3,7 +3,6 @@ import Start from "../game-object/Start"
 import TeamKeys from "../const/TeamKeys"
 import Horse from "../game-object/Horse"
 import HorseState from "../const/HorseState"
-import RollResult, { DiceResult } from "../const/DiceResult"
 
 export default class HorseController {
     scene: Phaser.Scene
@@ -50,7 +49,7 @@ export default class HorseController {
     }
 
     getChosenHorse(teamKey: TeamKeys): Horse | undefined {
-        const teamHorses = this.getTeamHorses(teamKey)
+        const teamHorses = this.getTeamAvailableHorses(teamKey)
         const chosenHorse = teamHorses.find(horse=> horse.isChoosing)
         return chosenHorse
     }
@@ -70,7 +69,12 @@ export default class HorseController {
     getTeamAliveHorses(teamKey: TeamKeys): Horse[] {
         const teamHorses = this.horses.filter(horse => horse.getTeamKey() === teamKey)
         const aliveHorses = teamHorses.filter(horse => horse.horseState === HorseState.Alive)
-
         return aliveHorses
+    }
+
+    setHorseToStart(horse?: Horse) {
+        if(!horse) return
+
+        
     }
 }

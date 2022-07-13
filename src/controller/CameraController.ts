@@ -19,7 +19,6 @@ export default class CameraController {
 
         this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
 
-        const cam = scene.cameras.main;
     }
 
     update(timer, delta) {

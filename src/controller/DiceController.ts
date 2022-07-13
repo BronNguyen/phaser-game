@@ -37,13 +37,6 @@ export default class DiceController {
         diceRectangle.on(GAMEOBJECT_POINTER_UP, this.rollDices, this)
     }
 
-
-    // handleRollingDice() {
-    //     if(this.gameTurnController.processPlayerRollingDice()) {
-    //         this.events.emit('roll-dices')
-    //     }
-    // }
-
     setDiceReady(): void {
         this.diceState = DiceState.Ready
     }

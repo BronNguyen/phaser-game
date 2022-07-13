@@ -21,7 +21,7 @@ import { shuffle, clone } from 'lodash'
 import GameTurnController from "../controller/GameTurnController";
 import DiceController from "../controller/DiceController";
 import HorseController from "../controller/HorseController";
-import TerritoryController from "../controller/TerritoryController";
+import LandController from "../controller/LandController";
 import CameraController from "../controller/CameraController";
 
 import DiceAnimation from "../animations/DiceAnimations";
@@ -37,7 +37,7 @@ export default class Battle extends Phaser.Scene {
     gameTurnController!: GameTurnController
     diceController!: DiceController
     horseController!: HorseController
-    territoryController!: TerritoryController
+    landController!: LandController
     cameraController!: CameraController
     horseAnimationManager!: HorseAnimation
     gameState = GameState.Start
@@ -61,29 +61,23 @@ export default class Battle extends Phaser.Scene {
     }
 
     create() {
-        const popup = new PopupContainer(this)
-
-        this.initiateAnimations()
-        this.initiateControllers()
-
-        const cursors = this.input.keyboard.createCursorKeys()
-
         this.playerGroup = this.make.group({
             classType: Player,
             runChildUpdate: true,
         })
-
         this.graphics = this.add.graphics()
-
-
+        this.initiateAnimations()
+        this.initiateControllers()
         this.initiateTeams()
     }
 
     initiateControllers() {
+        const emitter = new Phaser.Events.EventEmitter()
+
         this.diceController = new DiceController(this)
         this.horseController = new HorseController(this)
         this.gameTurnController = new GameTurnController(this)
-        this.territoryController = new TerritoryController(this)
+        this.landController = new LandController(this)
         this.cameraController = new CameraController(this)
     }
 
@@ -95,25 +89,23 @@ export default class Battle extends Phaser.Scene {
     initiateTeams() {
         const teamKeys = Object.keys(TeamKeys);
         teamKeys.forEach((teamKey, index) => {
-            this.initTeam(TeamKeys[teamKey], index)
+            this.createTeam(TeamKeys[teamKey], index)
         });
-
-
     }
 
-    initTeam(teamKey: TeamKeys, teamIndex) {
+    createTeam(teamKey: TeamKeys, teamIndex: number) {
         const player = this.playerGroup.create()
         player.setActive(false)
         player.setVisible(false)
         player.joinTeam(teamKey)
 
-        const teamStart = new Start(20 + teamIndex * 110, 300)
+        const teamStart = this.landController.createStart(teamIndex)
         teamStart.joinTeam(teamKey)
         teamStart.coloring(this.graphics)
 
         this.horseController.initTeamHorse(teamKey, teamStart)
-        this.territoryController.setTeamTerritories(teamKey, this.graphics)
-        this.territoryController.setTeamFinish(teamKey, this.graphics)
+        this.landController.setTeamTerritories(teamKey, this.graphics)
+        this.landController.setTeamFinish(teamKey, this.graphics)
     }
 
     startGame() {
@@ -175,7 +167,7 @@ export default class Battle extends Phaser.Scene {
 
             console.log('currentTeam: ', currentTeam)
             const teamHorses = this.horseController.getTeamHorses(currentTeam)
-            const teamInitiator = this.territoryController.getInitiator(currentTeam)
+            const teamInitiator = this.landController.getInitiator(currentTeam)
             const guardHorse = teamInitiator.getHorse()
             const isGuardHorseTeamHorse = guardHorse && guardHorse.getTeamKey() === currentTeam
 
@@ -192,9 +184,23 @@ export default class Battle extends Phaser.Scene {
 
                 if(horse.horseState === HorseState.Alive) {
                     const currentTerritory = horse.currentPlace
+
+                    if(currentTerritory instanceof Finish) {
+                        const finishIndex = currentTerritory.getFinishIndex()
+
+                        if(number !== finishIndex + 1 && diceResult !== DiceResult.Double) return
+
+                        const potentialFinish = this.landController.getFinishTerritory(finishIndex + 1, currentTeam)
+
+                        if(!potentialFinish) return
+
+                        horse.isAvailable = true
+                        horse.setPotentialDestination(potentialFinish)
+                    }
+
                     if(!(currentTerritory instanceof Territory) || currentTerritory instanceof Finish) return
 
-                    const territories = this.territoryController.fetchTerritories(currentTeam, currentTerritory, number)
+                    const territories = this.landController.fetchTerritories(currentTeam, currentTerritory, number)
                     if(!territories.length) return
 
                     const lastTerritory = territories.pop() as Territory
@@ -226,7 +232,7 @@ export default class Battle extends Phaser.Scene {
             }
 
             if(diceResult === DiceResult.Regular) {
-                availableHorses = processedHorses.filter((horse)=> horse.horseState === HorseState.Alive)
+                availableHorses = processedHorses.filter((horse) => horse.horseState === HorseState.Alive)
             }
             console.log('availableHorses: ', availableHorses)
 
@@ -253,14 +259,15 @@ export default class Battle extends Phaser.Scene {
 
             if(chosenHorse.horseState === HorseState.Dead) {
                 chosenHorse.spawn()
-                const initiator = this.territoryController.getInitiator(currentTeam)
+                const initiator = this.landController.getInitiator(currentTeam)
                 chosenHorse.moveTo(initiator)
+
                 //todo delay, horse move animation
             } else {
                 chosenHorse.setRaceDistance(number)
                 const territory = chosenHorse.getPotentialDestination()
                 if(!territory) return
-                chosenHorse.moveTo(territory)
+                const kickedHorse = chosenHorse.moveTo(territory)
             }
 
             this.horseController.resetAvailableHorse()
@@ -273,7 +280,7 @@ export default class Battle extends Phaser.Scene {
         if(this.gameState === GameState.EndPlayerTurn) {
             this.gameState = GameState.SwitchPlayer
         }
-        //camera controll
+        //camera control
         this.cameraController.update(time, delta)
     }
 }

@@ -1,11 +1,12 @@
-import ILand from "../interface/ILand"
 import TeamKeys from "../const/TeamKeys"
 import Territory from "../game-object/Territory"
 import Finish from "../game-object/Finish"
+import Start from "../game-object/Start"
 
-export default class TerritoryController {
+export default class LandController {
     scene: Phaser.Scene
     territories: Territory [] = []
+    starts: Start [] = []
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene
@@ -31,6 +32,16 @@ export default class TerritoryController {
         }
     }
 
+    createStart(teamIndex: number): Start {
+        const teamStart = new Start(20 + teamIndex * 110, 300)
+        this.starts.push(teamStart)
+        return teamStart
+    }
+
+    getStart(teamKey: TeamKeys): Start {
+        const teamStart = this.starts.find(start => start.getTeamKey() === teamKey) as Start
+        return teamStart
+    }
 
     setTeamTerritories(teamKey: TeamKeys, graphics: Phaser.GameObjects.Graphics) {
         let territoryCount = 0
@@ -76,8 +87,6 @@ export default class TerritoryController {
                 if(!current) return []
 
                 territories.push(current)
-                //@ts-ignore
-                console.log('current: ', current.getIndex(), current.getFinishIndex())
                 continue
             }
 
@@ -94,7 +103,6 @@ export default class TerritoryController {
                 current = this.getTerritory(index + 1)
                 if(!current) return []
 
-                console.log('index: ', current.getIndex())
                 territories.push(current)
             }
         }
@@ -114,7 +122,6 @@ export default class TerritoryController {
     }
 
     getFinishTerritory(finishIndex: number, teamKey: TeamKeys): Territory | undefined {
-        console.log('finishIndex: ', finishIndex)
         const territory = this.territories.find((ter)=> {
             if(ter instanceof Finish) {
                 return ter.getFinishIndex() === finishIndex && ter.getTeamKey() === teamKey
@@ -123,31 +130,6 @@ export default class TerritoryController {
 
         return territory
     }
-
-    public getTerritoriesWithinDistance(landFrom: ILand, landTo: ILand): ILand [] {
-        const territories: ILand[] = []
-
-        if(!(landTo instanceof Finish)) {
-            for(let i = landFrom.getIndex(); i < landTo.getIndex(); i++ ) {
-                territories.push(this.territories[i+1])
-            }
-        }
-
-        // if(!(landFrom instanceof Finish) && landTo instanceof Finish) {
-        //     const offset = 55 - this.distance
-
-        //     for(let i = 0; i < offset; i++){
-        //         territories.push(this.territories[landFrom.getIndex() + i + 1])
-        //     }
-
-        //     for(let i = 0; i < landTo.finishIndex; i++) {
-        //         territories.push(this.territories[])
-        //     }
-        // }
-
-        return territories
-    }
-
 
     getInitiator(teamKey): Territory {
         const initiator = this.getTeamTerritories(teamKey).find(ter=>ter.isInitiator) as Territory
