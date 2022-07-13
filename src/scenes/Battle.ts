@@ -22,6 +22,7 @@ import GameTurnController from "../controller/GameTurnController";
 import DiceController from "../controller/DiceController";
 import HorseController from "../controller/HorseController";
 import TerritoryController from "../controller/TerritoryController";
+import CameraController from "../controller/CameraController";
 
 import DiceAnimation from "../animations/DiceAnimations";
 
@@ -37,6 +38,7 @@ export default class Battle extends Phaser.Scene {
     diceController!: DiceController
     horseController!: HorseController
     territoryController!: TerritoryController
+    cameraController!: CameraController
     horseAnimationManager!: HorseAnimation
     gameState = GameState.Start
     horses: Horse[] = []
@@ -82,6 +84,7 @@ export default class Battle extends Phaser.Scene {
         this.horseController = new HorseController(this)
         this.gameTurnController = new GameTurnController(this)
         this.territoryController = new TerritoryController(this)
+        this.cameraController = new CameraController(this)
     }
 
     initiateAnimations() {
@@ -121,14 +124,12 @@ export default class Battle extends Phaser.Scene {
     }
 
 
-    update() {
+    update(time, delta) {
         this.count++
 
         const currentPlayer = this.gameTurnController.getCurrentPlayer()
         const currentTeam = currentPlayer?.getTeamKey()
         if(this.count > 100){
-            // console.log(this.gameState, currentTeam)
-
             this.count = 0
         }
 
@@ -174,12 +175,9 @@ export default class Battle extends Phaser.Scene {
 
             console.log('currentTeam: ', currentTeam)
             const teamHorses = this.horseController.getTeamHorses(currentTeam)
-            console.log('teamHorses: ', teamHorses)
             const teamInitiator = this.territoryController.getInitiator(currentTeam)
             const guardHorse = teamInitiator.getHorse()
-            console.log('guardHorse: ', guardHorse)
             const isGuardHorseTeamHorse = guardHorse && guardHorse.getTeamKey() === currentTeam
-            console.log('isGuardHorseTeamHorse: ', isGuardHorseTeamHorse)
 
             //process with number
             teamHorses.forEach((horse: Horse) => {
@@ -194,22 +192,17 @@ export default class Battle extends Phaser.Scene {
 
                 if(horse.horseState === HorseState.Alive) {
                     const currentTerritory = horse.currentPlace
-                    console.log('currentTerritory: ', currentTerritory)
-                    if(!(currentTerritory instanceof Territory)) return
+                    if(!(currentTerritory instanceof Territory) || currentTerritory instanceof Finish) return
 
                     const territories = this.territoryController.fetchTerritories(currentTeam, currentTerritory, number)
-                    console.log('territories: ', territories)
                     if(!territories.length) return
 
                     const lastTerritory = territories.pop() as Territory
-                    console.log('lastTerritory: ', lastTerritory)
 
                     const hasHorseConfront = territories.find((ter)=> !!ter.getHorse())
-                    console.log('hasHorseConfront: ', hasHorseConfront)
                     if(hasHorseConfront) return
 
                     const destinationHorse = lastTerritory.getHorse()
-                    console.log('destinationHorse: ', destinationHorse)
 
                     if(destinationHorse && destinationHorse.getTeamKey() === currentTeam) return
 
@@ -225,7 +218,7 @@ export default class Battle extends Phaser.Scene {
             //process with dice result
             if(diceResult === DiceResult.Double) {
                 this.gameTurnController.addActionCount()
-                //todo set finish rank up available
+
             }
 
             if(diceResult === DiceResult.OneSix) {
@@ -280,7 +273,7 @@ export default class Battle extends Phaser.Scene {
         if(this.gameState === GameState.EndPlayerTurn) {
             this.gameState = GameState.SwitchPlayer
         }
-
-
+        //camera controll
+        this.cameraController.update(time, delta)
     }
 }

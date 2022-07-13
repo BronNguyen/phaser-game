@@ -35,6 +35,10 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     }
 
     public setHorse(horse: Horse | undefined): void {
+        if(this.horse) {
+            //todo: make this horse come to base
+            this.horse.die()
+        }
         this.horse = horse
         if(!this.horse) return
 
@@ -60,6 +64,7 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     public coloring(graphics: Phaser.GameObjects.Graphics, scene: Phaser.Scene): void {
         graphics.fillStyle(this.color, 0.3)
         graphics.fillCircleShape(this)
-        scene.add.text(this.x, this. y, `${this.index}`, {color: 'black', fontSize: '30'})
+        //@ts-ignore
+        scene.add.text(this.x - 20, this.y - 20, `${this.index}`, {color: 'black', fontSize: 30})
     }
 }

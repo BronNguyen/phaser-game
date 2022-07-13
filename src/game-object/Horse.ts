@@ -4,7 +4,6 @@ import IHorse from "../interface/IHorse"
 import ITeam from "../interface/ITeam"
 import TeamKeys from "../const/TeamKeys"
 import ILand from "interface/ILand"
-import Finish from "./Finish"
 
 const { GAMEOBJECT_POINTER_UP } = Phaser.Input.Events
 
@@ -68,24 +67,6 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
 
     public setPotentialDestination(land: ILand| undefined): void {
         this.potentialDestination = land
-    }
-
-    public getAvailableDestination(number: number): {index: number ,isFinish : boolean} | undefined {
-        if(!(this.currentPlace instanceof Finish)) {
-            const distance = number + this.distance
-            const index = this.currentPlace.getIndex()
-
-            if(distance > 55) {
-                const finishOffset = distance - 55
-                return finishOffset < 7 ? {index: finishOffset, isFinish: true} : undefined
-            }
-
-            return {index: index + number, isFinish: false}
-        }
-
-        const finishIndex =  this.currentPlace.finishIndex
-
-        return {index: finishIndex + 1, isFinish: true}
     }
 
     public moveTo(land: ILand): void {

@@ -22,11 +22,10 @@ export default class TerritoryController {
             }
         }
 
-        let finishIndex = 0
         for(let y = 0; y < 4; y++) {
             for(let x = 0; x < 6; x++) {
                 index++
-                const finish = new Finish(30 + (x+ 14) * 65, 30 + y * 65, index, finishIndex)
+                const finish = new Finish(30 + (x+ 14) * 65, 30 + y * 65, index, x + 1)
                 this.territories.push(finish)
             }
         }
@@ -68,22 +67,23 @@ export default class TerritoryController {
 
     fetchTerritories(teamKey: TeamKeys, currentTerritory: Territory, moveNumber: number): Territory [] {
         const territories: Territory[] = []
-
         let current: Territory| undefined = currentTerritory
-        console.log('current: ', current)
 
         for (let i = 0; i < moveNumber; i++) {
-
             if (current instanceof Finish ) {
-                const index = current.getIndex()
+                const index = current.getFinishIndex()
                 current = this.getFinishTerritory(index + 1, teamKey)
                 if(!current) return []
+
+                territories.push(current)
+                //@ts-ignore
+                console.log('current: ', current.getIndex(), current.getFinishIndex())
+                continue
             }
 
             if(!current) return []
 
             let isTeamFinishGate = current.isFinishGate && current.getTeamKey() === teamKey
-            console.log('isTeamFinishGate: ', isTeamFinishGate)
 
             if (isTeamFinishGate) {
                 current = this.getFinishTerritory(1, teamKey)
@@ -94,6 +94,7 @@ export default class TerritoryController {
                 current = this.getTerritory(index + 1)
                 if(!current) return []
 
+                console.log('index: ', current.getIndex())
                 territories.push(current)
             }
         }
@@ -108,17 +109,15 @@ export default class TerritoryController {
 
     getTerritory(index: number): Territory {
         const availableIndex = Phaser.Math.Wrap(index, 1, 57)
-        console.log('availableIndex: ', availableIndex)
         const territory = this.territories.find(ter=> ter.index === availableIndex) as Territory
-        console.log('territory: ', territory)
         return territory
     }
 
     getFinishTerritory(finishIndex: number, teamKey: TeamKeys): Territory | undefined {
-
+        console.log('finishIndex: ', finishIndex)
         const territory = this.territories.find((ter)=> {
             if(ter instanceof Finish) {
-                return ter.finishIndex === finishIndex && ter.getTeamKey() === teamKey
+                return ter.getFinishIndex() === finishIndex && ter.getTeamKey() === teamKey
             }
         })
 
