@@ -45,7 +45,6 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
 
         this.horse = comingHorse
         this.horse.setPosition(this.x, this.y)
-        //todo: emit this kicked horse
     }
 
     public getHorse(): Horse | null {

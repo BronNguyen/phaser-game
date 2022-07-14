@@ -41,6 +41,7 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
     }
 
     adopt(horse: Horse) {
+        console.log('adopt: ')
         for(let i = 0; i < this.positions.length; i++) {
             if(!this.positions[i].horse) {
                 this.positions[i].horse = horse

@@ -12,7 +12,6 @@ import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory"
 import Player from "../game-object/Player";
 import Territory from "../game-object/Territory";
 import Horse from "../game-object/Horse";
-import Start from "../game-object/Start";
 import Finish from "../game-object/Finish";
 import Dice from "../game-object/Dice";
 

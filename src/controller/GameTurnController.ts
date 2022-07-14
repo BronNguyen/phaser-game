@@ -10,10 +10,12 @@ export default class GameTurnController {
     scene: Battle
     currentIndex = 0
     lastIndex = 0
+    arrow: Phaser.GameObjects.Image
     playerOrders: PlayerOrder = {}
 
     constructor(scene: Battle) {
         this.scene = scene
+        this.arrow = this.scene.add.image(0, 0, 'arrow')
     }
 
     resetAllPlayersState(): void {
@@ -46,6 +48,7 @@ export default class GameTurnController {
         this.lastIndex = this.currentIndex
         this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 0 , 4)
         const player = this.getCurrentPlayer()
+        this.arrow.setPosition(player.x, 370)
     }
 
     processPlayerStartTurn(): boolean {

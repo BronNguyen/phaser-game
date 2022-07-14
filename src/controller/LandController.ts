@@ -11,11 +11,21 @@ export default class LandController {
     constructor(scene: Phaser.Scene) {
         this.scene = scene
         this.initTerritory()
+        this.initEvents()
+    }
+
+    initEvents() {
+        this.scene.events.on('kick-horse', this.handleHorseDead, this)
+    }
+
+    handleHorseDead(horse, teamKey: TeamKeys) {
+        const start = this.getStart(teamKey)
+        start.adopt(horse)
     }
 
     initTerritory(): void {
         let index = 0
-        for(let y = 0; y < 4; y++){
+        for(let y = 0; y  < 4; y++){
             for(let x = 0; x < 14; x++){
                 index++
                 const territory  = new Territory(30 + x * 65, 30 + y * 65, index)
