@@ -114,6 +114,12 @@ export default class Battle extends Phaser.Scene {
         this.gameTurnController.setPlayerOrder(sortedPlayers)
     }
 
+    startPlayerTurn = () => {
+        this.horseController.resetAvailableHorse()
+        this.horseController.resetChosenHorse()
+        this.gameState = GameState.StartPlayerTurn
+    }
+
 
     update(time, delta) {
         this.count++
@@ -164,10 +170,10 @@ export default class Battle extends Phaser.Scene {
 
             const { diceResult, number } = rollResult
 
-            console.log('currentTeam: ', currentTeam)
             const teamHorses = this.horseController.getTeamHorses(currentTeam)
             const teamInitiator = this.landController.getInitiator(currentTeam)
             const guardHorse = teamInitiator.getHorse()
+            console.log('guardHorse: ', guardHorse)
             const isGuardHorseTeamHorse = guardHorse && guardHorse.getTeamKey() === currentTeam
 
             //process with number
@@ -194,24 +200,25 @@ export default class Battle extends Phaser.Scene {
                         if(!potentialFinish) return
 
                         horse.isAvailable = true
-                        horse.setPotentialDestination(potentialFinish)
+                        horse.setHorsePath([potentialFinish])
                     }
-
+                    //todo: can move with double / 2 number
                     if(!(currentTerritory instanceof Territory) || currentTerritory instanceof Finish) return
 
                     const territories = this.landController.fetchTerritories(currentTeam, currentTerritory, number)
                     if(!territories.length) return
 
-                    const lastTerritory = territories.pop() as Territory
+                    const cloneTerritories = clone(territories)
+                    const lastTerritory = cloneTerritories.pop() as Territory
 
-                    const hasHorseConfront = territories.find((ter)=> !!ter.getHorse())
+                    const hasHorseConfront = cloneTerritories.find((ter)=> !!ter.getHorse())
                     if(hasHorseConfront) return
 
                     const destinationHorse = lastTerritory.getHorse()
 
                     if(destinationHorse && destinationHorse.getTeamKey() === currentTeam) return
 
-                    horse.setPotentialDestination(lastTerritory)
+                    horse.setHorsePath(territories)
                     horse.isAvailable = true
                 }
             })
@@ -260,19 +267,15 @@ export default class Battle extends Phaser.Scene {
                 chosenHorse.spawn()
                 const initiator = this.landController.getInitiator(currentTeam)
                 chosenHorse.moveTo(initiator)
-
-                //todo delay, horse move animation
+                this.startPlayerTurn()
             } else {
                 chosenHorse.setRaceDistance(number)
-                const territory = chosenHorse.getPotentialDestination()
-                if(!territory) return
-                const kickedHorse = chosenHorse.moveTo(territory)
+                const territories = chosenHorse.getHorsePath()
+
+                if(!territories) return
+
+                chosenHorse.moveOnPath(territories, this.startPlayerTurn)
             }
-
-            this.horseController.resetAvailableHorse()
-            this.horseController.resetChosenHorse()
-            this.gameState = GameState.StartPlayerTurn
-
             return
         }
 

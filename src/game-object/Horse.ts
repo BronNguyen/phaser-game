@@ -15,7 +15,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     private distance = 0
     horseState = HorseState.Dead
     currentPlace!: ILand
-    potentialDestination!: ILand| undefined
+    horsePath!: ILand []| undefined
 
     constructor(scene: Phaser.Scene) {
         super(scene, 0, 0, 'horse')
@@ -61,12 +61,12 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         return this.distance
     }
 
-    public getPotentialDestination(): ILand| undefined {
-        return this.potentialDestination
+    public getHorsePath(): ILand []| undefined {
+        return this.horsePath
     }
 
-    public setPotentialDestination(land: ILand| undefined): void {
-        this.potentialDestination = land
+    public setHorsePath(lands: ILand [] | undefined): void {
+        this.horsePath = lands
     }
 
     public moveTo(land: ILand): void {
@@ -87,6 +87,33 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         if(kickedHorse) {
             this.scene.events.emit('kick-horse', kickedHorse)
         }
+    }
+
+    public moveOnPath(lands: ILand [], completeCallback: Function): void {
+        const tweenArray = [] as any
+
+        lands.forEach(land => {
+            const {x, y} = land.getPosition()
+            tweenArray.push({
+                y: y,
+                targets: this,
+                duration: 0,
+            },
+            {
+                x,
+                y: { value: y - 15, yoyo: true, duration: 100 },
+                targets: this,
+                duration: 200
+            })
+        })
+
+        this.scene.tweens.timeline({
+            tweens: tweenArray,
+            onComplete:() => {
+                this.moveTo(lands[lands.length-1])
+                completeCallback()
+            }
+        })
     }
 
     public die(): void {

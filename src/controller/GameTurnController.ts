@@ -38,6 +38,8 @@ export default class GameTurnController {
         playerOrder.forEach((player, index)=> {
             this.playerOrders[index] = player
         })
+        const player = playerOrder[0]
+        this.setArrowPosition(player.getTeamKey())
     }
 
     getCurrentPlayer(): Player {
@@ -48,7 +50,31 @@ export default class GameTurnController {
         this.lastIndex = this.currentIndex
         this.currentIndex = Phaser.Math.Wrap(++this.currentIndex, 0 , 4)
         const player = this.getCurrentPlayer()
-        this.arrow.setPosition(player.x, 370)
+        const playerTeam = player.getTeamKey()
+        this.setArrowPosition(playerTeam)
+    }
+
+    setArrowPosition(teamKey) {
+        let index
+        switch (teamKey) {
+            case 'Red':
+                index = 0
+                break;
+
+            case 'Green':
+                index = 1
+                break;
+
+            case 'Blue':
+                index = 2
+                break;
+
+            default:
+                index = 3
+                break;
+        }
+
+        this.arrow.setPosition(65 + index * 110 , 450)
     }
 
     processPlayerStartTurn(): boolean {

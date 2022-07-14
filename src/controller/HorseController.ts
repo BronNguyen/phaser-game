@@ -38,9 +38,9 @@ export default class HorseController {
     }
 
     resetAvailableHorse(): void {
-        this.horses.map(horse=> {
+        this.horses.map(horse => {
             horse.isAvailable = false
-            horse.setPotentialDestination(undefined)
+            horse.setHorsePath(undefined)
         })
     }
 
@@ -70,11 +70,5 @@ export default class HorseController {
         const teamHorses = this.horses.filter(horse => horse.getTeamKey() === teamKey)
         const aliveHorses = teamHorses.filter(horse => horse.horseState === HorseState.Alive)
         return aliveHorses
-    }
-
-    setHorseToStart(horse?: Horse) {
-        if(!horse) return
-
-        
     }
 }
