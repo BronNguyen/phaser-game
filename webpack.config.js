@@ -8,7 +8,7 @@ module.exports = {
   entry: "./src/index.ts",
   mode: "development",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "build"),
     filename: "app.js",
   },
   module: {
@@ -40,7 +40,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   devServer: {
-    contentBase: path.join(__dirname, "dist"),
+    contentBase: path.join(__dirname, "build"),
     compress: true,
     port: 9000,
   },
