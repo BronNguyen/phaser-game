@@ -83,10 +83,6 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         this.horseState = HorseState.Alive
         this.isChoosing = false
         kickedHorse?.die()
-
-        if(kickedHorse) {
-            this.scene.events.emit('kick-horse', kickedHorse)
-        }
     }
 
     public moveOnPath(lands: ILand [], completeCallback: Function): void {

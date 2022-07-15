@@ -61,14 +61,19 @@ export default class HorseController {
 
     getTeamDeadHorses(teamKey: TeamKeys): Horse[] {
         const teamHorses = this.horses.filter(horse => horse.getTeamKey() === teamKey)
-        const deadHorses = teamHorses.filter(horse => horse.horseState === HorseState.Dead)
+        const deadHorses = teamHorses.filter(horse => horse.getHorseState() === HorseState.Dead)
 
+        return deadHorses
+    }
+
+    getDeadHorses(): Horse [] {
+        const deadHorses = this.horses.filter(horse => horse.getHorseState() === HorseState.Dead)
         return deadHorses
     }
 
     getTeamAliveHorses(teamKey: TeamKeys): Horse[] {
         const teamHorses = this.horses.filter(horse => horse.getTeamKey() === teamKey)
-        const aliveHorses = teamHorses.filter(horse => horse.horseState === HorseState.Alive)
+        const aliveHorses = teamHorses.filter(horse => horse.getHorseState() === HorseState.Alive)
         return aliveHorses
     }
 }

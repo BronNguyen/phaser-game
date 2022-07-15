@@ -117,6 +117,8 @@ export default class Battle extends Phaser.Scene {
     startPlayerTurn = () => {
         this.horseController.resetAvailableHorse()
         this.horseController.resetChosenHorse()
+        const deadHorses = this.horseController.getDeadHorses()
+        this.landController.adoptDeadHorses(deadHorses)
         this.gameState = GameState.StartPlayerTurn
     }
 

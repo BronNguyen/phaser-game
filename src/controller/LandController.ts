@@ -2,6 +2,7 @@ import TeamKeys from "../const/TeamKeys"
 import Territory from "../game-object/Territory"
 import Finish from "../game-object/Finish"
 import Start from "../game-object/Start"
+import Horse from "../game-object/Horse"
 
 export default class LandController {
     scene: Phaser.Scene
@@ -11,16 +12,6 @@ export default class LandController {
     constructor(scene: Phaser.Scene) {
         this.scene = scene
         this.initTerritory()
-        this.initEvents()
-    }
-
-    initEvents() {
-        this.scene.events.on('kick-horse', this.handleHorseDead, this)
-    }
-
-    handleHorseDead(horse, teamKey: TeamKeys) {
-        const start = this.getStart(teamKey)
-        start.adopt(horse)
     }
 
     initTerritory(): void {
@@ -118,6 +109,14 @@ export default class LandController {
         }
 
         return territories
+    }
+
+    adoptDeadHorses(horses: Horse []) {
+        horses.forEach(horse => {
+            const teamKey = horse.getTeamKey()
+            const start = this.getStart(teamKey)
+            start.adopt(horse)
+        })
     }
 
     getTeamTerritories(teamKey: TeamKeys): Territory [] {
