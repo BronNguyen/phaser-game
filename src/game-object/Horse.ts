@@ -94,15 +94,12 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
 
         lands.forEach(land => {
             const {x, y} = land.getPosition()
-            tweenArray.push({
-                y: y,
-                targets: this,
-                duration: 0,
-            },
+            tweenArray.push(
             {
                 x,
-                y: { value: y - 15, yoyo: true, duration: 100 },
+                y,
                 targets: this,
+                ease: 'cubic.in',
                 duration: 200
             })
         })
