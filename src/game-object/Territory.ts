@@ -37,11 +37,15 @@ export default class Territory extends Phaser.Geom.Circle implements ITeam, ILan
     public setHorse(comingHorse: Horse | undefined): void {
         //allow set undefined to land (no horse occupies this land)
         this.horse = comingHorse
-        this.horse?.setPosition(this.x, this.y)
+
+        if(!comingHorse) return
+
+        comingHorse.currentPlace = this
+        comingHorse.setPosition(this.x, this.y)
     }
 
-    public getHorse(): Horse | null {
-        if(!this.horse) return null
+    public getHorse(): Horse | undefined {
+        if(!this.horse) return undefined
 
         return this.horse
     }

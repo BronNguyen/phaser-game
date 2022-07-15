@@ -11,16 +11,7 @@ export class PlayerGameObjectGroup extends Phaser.GameObjects.Group {
             runChildUpdate: true,
 
         })
-
-        console.log(this.children)
-
-        this.yield()
     }
-
-    yield(){
-        console.log('player group created')
-    }
-
 }
 
 export default class PlayerPlugin extends Phaser.Plugins.ScenePlugin {

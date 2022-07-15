@@ -4,7 +4,7 @@ interface ILand {
     horse: Horse|undefined
 
     setHorse(horse: Horse| undefined): void
-    getHorse(): Horse | null
+    getHorse(): Horse | undefined
     getIndex(): number
     getPosition(): {x: number, y: number}
 }

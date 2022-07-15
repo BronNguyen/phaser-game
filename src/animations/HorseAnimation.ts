@@ -7,7 +7,11 @@ const AVAILABLE_HORSE_CONFIG = {
     duration: 300,
     yoyo: true,
     repeat: -1,
-    paused: true
+    paused: true,
+    onStop(a, b) {
+        console.log('a, b: ', a, b)
+        
+    }
 }
 
 class HorseAnimation {
@@ -19,10 +23,10 @@ class HorseAnimation {
         this.scene = scene
     }
 
-    playAvailableHorseAnimation(horse: Horse[]): void {
+    playAvailableHorseAnimation(horses: Horse[]): void {
         if(this.availableHorseTween) return
 
-        this.availableHorseTween = this.scene.tweens.add({...AVAILABLE_HORSE_CONFIG, targets: horse})
+        this.availableHorseTween = this.scene.tweens.add({...AVAILABLE_HORSE_CONFIG, targets: horses})
         this.availableHorseTween.play()
     }
 

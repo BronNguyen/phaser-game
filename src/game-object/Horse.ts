@@ -13,8 +13,8 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     private color!: number
     private teamKey = TeamKeys.Red
     private distance = 0
-    horseState = HorseState.Dead
-    currentPlace!: ILand | undefined
+    horseState: HorseState
+    currentPlace!: ILand
     horsePath!: ILand []| undefined
 
     constructor(scene: Phaser.Scene) {
@@ -72,17 +72,15 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     public moveTo(land: ILand): void {
         if(!this.isChoosing) return
 
-        const lastPlace = this.currentPlace
-        lastPlace?.setHorse(undefined)
+        this.currentPlace.setHorse(undefined)
         this.horseState = HorseState.Moving
-        this.currentPlace = land
         const kickedHorse = land.getHorse()
+        kickedHorse?.die()
         land.setHorse(this)
         const {x, y} = land.getPosition()
         this.setPosition(x, y)
         this.horseState = HorseState.Alive
         this.isChoosing = false
-        kickedHorse?.die()
     }
 
     public moveOnPath(lands: ILand [], completeCallback: Function): void {

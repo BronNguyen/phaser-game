@@ -171,7 +171,6 @@ export default class Battle extends Phaser.Scene {
             const teamHorses = this.horseController.getTeamHorses(currentTeam)
             const teamInitiator = this.landController.getInitiator(currentTeam)
             const guardHorse = teamInitiator.getHorse()
-            console.log('guardHorse: ', guardHorse)
             const isGuardHorseTeamHorse = guardHorse && guardHorse.getTeamKey() === currentTeam
 
             //process with number
@@ -200,6 +199,7 @@ export default class Battle extends Phaser.Scene {
                         horse.isAvailable = true
                         horse.setHorsePath([potentialFinish])
                     }
+
                     //todo: can move with double / 2 number
                     if(!(currentTerritory instanceof Territory) || currentTerritory instanceof Finish) return
 
@@ -222,9 +222,7 @@ export default class Battle extends Phaser.Scene {
             })
 
             const processedHorses = this.horseController.getTeamAvailableHorses(currentTeam)
-            console.log('processedHorses: ', processedHorses)
             let availableHorses = clone(processedHorses)
-            console.log('availableHorses: ', availableHorses)
             //process with dice result
             if(diceResult === DiceResult.Double) {
                 this.gameTurnController.addActionCount()
@@ -238,7 +236,6 @@ export default class Battle extends Phaser.Scene {
             if(diceResult === DiceResult.Regular) {
                 availableHorses = processedHorses.filter((horse) => horse.horseState === HorseState.Alive)
             }
-            console.log('availableHorses: ', availableHorses)
 
             if(availableHorses.length) {
                 this.horseAnimationManager.playAvailableHorseAnimation(availableHorses)
