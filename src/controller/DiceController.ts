@@ -57,7 +57,7 @@ export default class DiceController {
 
         const number = this.dices.reduce((currentNumber, dice )=> currentNumber + dice.face, 0)
 
-        return {diceResult: DiceResult.Double, number: 12}
+        // return {diceResult: DiceResult.Double, number: 12}
         return { diceResult, number }
     }
 

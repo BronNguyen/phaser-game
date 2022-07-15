@@ -1,13 +1,12 @@
-import Phaser, { Tilemaps } from "phaser"
+import Phaser from "phaser"
 import PluginName from "../const/Plugins";
 import SceneKeys from "../const/SceneKeys"
 import TeamKeys from "../const/TeamKeys";
 import GameState from "../const/GameState";
 import HorseState from "../const/HorseState";
 import RollResult, { DiceResult } from "../const/DiceResult";
-import PlayerColors from "../const/PlayerColors";
 
-import PlayerPlugin, { PlayerGameObjectGroup } from "../factories/PlayerFactory";
+import PlayerPlugin from "../factories/PlayerFactory";
 
 import Player from "../game-object/Player";
 import Territory from "../game-object/Territory";
@@ -25,9 +24,6 @@ import CameraController from "../controller/CameraController";
 
 import DiceAnimation from "../animations/DiceAnimations";
 
-import PopupContainer from "../popup/popup";
-import PlayerState from "../const/PlayerState";
-import DiceState from "../const/DiceState";
 import HorseAnimation from "../animations/HorseAnimation";
 
 export default class Battle extends Phaser.Scene {

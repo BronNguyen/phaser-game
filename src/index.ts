@@ -1,11 +1,6 @@
 import Phaser from 'phaser';
-import Smoke from './scenes/Smoke';
 import Preloader from './scenes/Preloader';
-import Fruit from './scenes/Fruit';
-import Example from './scenes/Example';
-import PlayerPlugin from './factories/PlayerFactory';
 import Battle from './scenes/Battle';
-import PluginName from './const/Plugins';
 
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -20,12 +15,8 @@ const config: Phaser.Types.Core.GameConfig = {
 		},
 	},
 	transparent: true,
-	// plugins: {
-    //     global: [
-    //         { key: PluginName.PlayerPlugin, plugin: PlayerPlugin, start: true }
-    //     ]
-    // },
-	scene: [Preloader, Battle, Example,Fruit, Smoke]
+
+	scene: [Preloader, Battle]
 }
 
 export default new Phaser.Game(config)

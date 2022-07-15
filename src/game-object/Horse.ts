@@ -14,7 +14,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
     private teamKey = TeamKeys.Red
     private distance = 0
     horseState = HorseState.Dead
-    currentPlace!: ILand
+    currentPlace!: ILand | undefined
     horsePath!: ILand []| undefined
 
     constructor(scene: Phaser.Scene) {

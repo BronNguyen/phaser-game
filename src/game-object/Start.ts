@@ -9,11 +9,11 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
     private color!: number
     private teamKey = TeamKeys.Red
     private horses: Horse [] = []
-    private positions: StartPosition []
+    private startPositions: StartPosition []
 
     constructor(x, y) {
         super(x, y, 100, 100)
-        this.positions =
+        this.startPositions =
         [{
             index: 1,
             x: 30,
@@ -41,12 +41,12 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
     }
 
     adopt(horse: Horse) {
-        console.log('adopt: ')
-        for(let i = 0; i < this.positions.length; i++) {
-            if(!this.positions[i].horse) {
-                this.positions[i].horse = horse
-                const {x, y} = this.positions[i]
+        for(let i = 0; i < this.startPositions.length; i++) {
+            if(!this.startPositions[i].horse) {
+                const {x, y} = this.startPositions[i]
+                this.startPositions[i].horse = horse
                 horse.setPosition(this.left + x, this.top + y)
+                horse.currentPlace = undefined
                 return
             }
         }
