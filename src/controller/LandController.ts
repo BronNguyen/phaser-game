@@ -111,7 +111,7 @@ export default class LandController {
         return territories
     }
 
-    adoptDeadHorses(horses: Horse []) {
+    adoptHomelessHorses(horses: Horse []) {
         horses.forEach(horse => {
             const teamKey = horse.getTeamKey()
             const start = this.getStart(teamKey)

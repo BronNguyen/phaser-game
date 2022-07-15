@@ -1,7 +1,7 @@
 enum HorseState  {
     Dead,
     Alive,
-    Sleep,
+    Homeless,
     Choosing,
     Moving,
     Power,

@@ -116,6 +116,11 @@ export default class Battle extends Phaser.Scene {
         this.gameState = GameState.StartPlayerTurn
     }
 
+    assertHorsePath(obj: any): asserts obj is Horse[] {
+        if(!(obj instanceof Array)) {
+            throw new Error('invalid Horse Path')
+        }
+    }
 
     update(time, delta) {
         this.count++
@@ -238,14 +243,14 @@ export default class Battle extends Phaser.Scene {
             if(availableHorses.length) {
                 this.horseAnimationManager.playAvailableHorseAnimation(availableHorses)
                 this.horseController.resetChosenHorse()
-                this.gameState = GameState.MoveHorse
+                this.gameState = GameState.ChooseHorse
             } else {
                 this.gameState = GameState.StartPlayerTurn
                 return
             }
         }
 
-        if(this.gameState === GameState.MoveHorse) {
+        if(this.gameState === GameState.ChooseHorse) {
             if(!rollResult) return
 
             const { number } = rollResult
@@ -260,19 +265,24 @@ export default class Battle extends Phaser.Scene {
                 chosenHorse.spawn()
                 const initiator = this.landController.getInitiator(currentTeam)
                 chosenHorse.moveTo(initiator)
-                this.startPlayerTurn()
+                this.gameState = GameState.MoveHorse
             } else {
                 chosenHorse.setRaceDistance(number)
                 const territories = chosenHorse.getHorsePath()
 
-                if(!territories) return
+                this.assertHorsePath(territories)
 
-                chosenHorse.moveOnPath(territories, this.startPlayerTurn)
+                chosenHorse.moveOnPath(territories, ()=> {
+                    this.gameState = GameState.MoveHorse
+                })
             }
-            //todo: solving adopt deadhorse to new place
-            const deadHorses = this.horseController.getDeadHorses()
-            this.landController.adoptDeadHorses(deadHorses)
-            return
+        }
+        //todo: solving adopt deadhorse to new place
+
+        if(this.gameState === GameState.MoveHorse) {
+            const homelessHorses = this.horseController.getHomelessHorses()
+            this.landController.adoptHomelessHorses(homelessHorses)
+            this.startPlayerTurn()
         }
 
         if(this.gameState === GameState.EndPlayerTurn) {

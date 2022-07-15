@@ -6,7 +6,7 @@ interface IHorse {
     getHorseState(): HorseState
     spawn(): void
     moveTo(land: ILand): void
-    die(): void
+    beHomeless(): void
 }
 
 export default IHorse

@@ -66,8 +66,8 @@ export default class HorseController {
         return deadHorses
     }
 
-    getDeadHorses(): Horse [] {
-        const deadHorses = this.horses.filter(horse => horse.getHorseState() === HorseState.Dead)
+    getHomelessHorses(): Horse [] {
+        const deadHorses = this.horses.filter(horse => horse.getHorseState() === HorseState.Homeless)
         return deadHorses
     }
 

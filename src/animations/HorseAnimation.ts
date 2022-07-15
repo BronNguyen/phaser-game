@@ -51,7 +51,6 @@ class HorseAnimation {
         this.scene.tweens.remove(this.chosenHorseTween)
         this.availableHorseTween = undefined
     }
-
 }
 
 export default HorseAnimation

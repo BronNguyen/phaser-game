@@ -23,6 +23,7 @@ class StartPosition implements ILand {
         if(!horse) return
 
         horse.currentPlace = this
+        horse.die()
         this.resetHorsePosition()
     }
 

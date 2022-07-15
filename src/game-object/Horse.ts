@@ -19,7 +19,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
 
     constructor(scene: Phaser.Scene) {
         super(scene, 0, 0, 'horse')
-        this.horseState = HorseState.Dead
+        this.horseState = HorseState.Homeless
         // this.index = 0
         this.setInteractive()
         scene.add.existing(this)
@@ -75,7 +75,7 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         this.currentPlace.setHorse(undefined)
         this.horseState = HorseState.Moving
         const kickedHorse = land.getHorse()
-        kickedHorse?.die()
+        kickedHorse?.beHomeless()
         land.setHorse(this)
         this.horseState = HorseState.Alive
         this.isChoosing = false
@@ -103,6 +103,10 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
                 completeCallback()
             }
         })
+    }
+
+    public beHomeless(): void {
+        this.horseState = HorseState.Homeless
     }
 
     public die(): void {

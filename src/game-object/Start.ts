@@ -23,7 +23,6 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
     adopt(horse: Horse) {
         const emptyStart = this.startPositions.find(position => !position.getHorse())
         if(!emptyStart) return
-
         emptyStart.setHorse(horse)
     }
 

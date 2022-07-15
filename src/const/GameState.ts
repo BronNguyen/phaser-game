@@ -4,6 +4,7 @@ enum GameState {
     StartPlayerTurn = 'StartPlayerTurn',
     PlayerTurn = 'PlayerTurn',
     AfterRollDice = 'RollingDice',
+    ChooseHorse = 'ChooseHorse',
     MoveHorse = 'MoveHorse',
     EndPlayerTurn = 'EndPlayerTurn',
     Over = 'Over'
