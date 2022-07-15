@@ -9,7 +9,7 @@ const AVAILABLE_HORSE_CONFIG = {
     repeat: -1,
     paused: true,
     onStop(_, horses) {
-        horses.map(horse => horse.currentPlace.setHorsePosition())
+        horses.map(horse => horse.currentPlace.resetHorsePosition())
     }
 }
 

@@ -112,9 +112,7 @@ export default class LandController {
     }
 
     adoptDeadHorses(horses: Horse []) {
-        const deadHorsesOnRoad = horses.filter(horse => horse.currentPlace)
-
-        deadHorsesOnRoad.forEach(horse => {
+        horses.forEach(horse => {
             const teamKey = horse.getTeamKey()
             const start = this.getStart(teamKey)
             start.adopt(horse)

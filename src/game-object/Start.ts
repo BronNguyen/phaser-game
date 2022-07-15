@@ -21,24 +21,16 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
     }
 
     adopt(horse: Horse) {
-        for(let i = 0; i < this.startPositions.length; i++) {
-            if(!this.startPositions[i].getHorse()) {
-                const {x, y} = this.startPositions[i].getPosition()
-                this.startPositions[i].setHorse(horse)
-                this.startPositions[i].setHorsePosition()
-                return
-            }
-        }
+        const emptyStart = this.startPositions.find(position => !position.getHorse())
+        if(!emptyStart) return
+
+        emptyStart.setHorse(horse)
     }
 
     joinTeam(teamKey: TeamKeys): void {
         this.teamKey = teamKey
         this.color = PlayerColors[teamKey]
     }
-
-    // setHorse(horse: Horse): void {
-    //     this.horses.push(horse)
-    // }
 
     getPosition(): { x: number; y: number } {
         return {x: this.x, y: this.y}

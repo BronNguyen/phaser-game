@@ -77,7 +77,6 @@ export default class Horse extends Phaser.GameObjects.Image implements IHorse, I
         const kickedHorse = land.getHorse()
         kickedHorse?.die()
         land.setHorse(this)
-        land.setHorsePosition()
         this.horseState = HorseState.Alive
         this.isChoosing = false
     }
