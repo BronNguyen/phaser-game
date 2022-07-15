@@ -25,6 +25,11 @@ class StartPosition implements ILand {
         horse.currentPlace = this
     }
 
+    setHorsePosition(): void {
+        const {x, y} = this
+        this.horse?.setPosition(x, y)
+    }
+
     getIndex(): number {
         return this.index
     }

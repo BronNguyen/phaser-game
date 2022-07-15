@@ -13,10 +13,10 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
     constructor(x, y) {
         super(x, y, 100, 100)
         this.startPositions = [
-            new StartPosition(1, 30, 30),
-            new StartPosition(2, 70, 30),
-            new StartPosition(3, 30, 70),
-            new StartPosition(4, 70, 70)
+            new StartPosition(1, this.left + 30, this.top + 30),
+            new StartPosition(2, this.left + 70, this.top + 30),
+            new StartPosition(3, this.left + 30, this.top + 70),
+            new StartPosition(4, this.left + 70, this.top + 70)
         ]
     }
 
@@ -25,7 +25,7 @@ export default class Start extends  Phaser.Geom.Rectangle implements ITeam, ISha
             if(!this.startPositions[i].getHorse()) {
                 const {x, y} = this.startPositions[i].getPosition()
                 this.startPositions[i].setHorse(horse)
-                horse.setPosition(this.left + x, this.top + y)
+                this.startPositions[i].setHorsePosition()
                 return
             }
         }

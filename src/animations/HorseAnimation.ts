@@ -8,9 +8,8 @@ const AVAILABLE_HORSE_CONFIG = {
     yoyo: true,
     repeat: -1,
     paused: true,
-    onStop(a, b) {
-        console.log('a, b: ', a, b)
-        
+    onStop(_, horses) {
+        horses.map(horse => horse.currentPlace.setHorsePosition())
     }
 }
 
